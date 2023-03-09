@@ -63,8 +63,9 @@ namespace Autohand.Demo{
                     particles = Instantiate(effect, grabbable.transform.position, grabbable.transform.rotation);
                 else
                     particles = effect;
-        
-                effect.Play();
+
+                particles.transform.parent = null;
+                particles.Play();
 
                 Rigidbody rb;
                 if(applyVelocityOnSmash && ((rb = grabbable.body) || gameObject.CanGetComponent(out rb))){

@@ -2,6 +2,11 @@ using NaughtyAttributes;
 using UnityEngine;
 
 namespace Autohand{
+    public enum DistanceGrabType {
+        Velocity,
+        Linear
+    }
+
     [RequireComponent(typeof(Grabbable))]
     [HelpURL("https://earnestrobot.notion.site/Distance-Grabbing-19e4e8b14f00428295eca75fca752787")]
     public class DistanceGrabbable : MonoBehaviour{
@@ -9,27 +14,28 @@ namespace Autohand{
         public bool ignoreMe;
         
         [Header("Pull")]
-        public bool instantPull = false;
+        public bool instantPull = true;
 
-        [Header("Velocity Shoot")]
+
+        public DistanceGrabType grabType;
+
         [Range(0.4f, 1.1f)]
         [Tooltip("Use this to adjust the angle of the arch that the gameobject follows while shooting towards your hand.")]
-        [HideIf("instantPull")]
+        [ShowIf("grabType", DistanceGrabType.Velocity)]
         public float archMultiplier = .6f;
-
         [Tooltip("Slow down or speed up gravitation to your liking.")]
-        [HideIf("instantPull")]
+        [ShowIf("grabType", DistanceGrabType.Velocity)]
         public float gravitationVelocity = 1f;
 
 
 
         [Header("Rotation")]
         [Tooltip("This enables rotation which makes the gameobject orient to the rotation of you hand as it moves through the air. All below rotation variables have no use when this is false.")]
-        [HideIf("instantPull")]
+        [ShowIf("grabType", DistanceGrabType.Velocity)]
         public bool rotate = true;
 
         [Tooltip("Speed that the object orients to the rotation of your hand.")]
-        [HideIf("instantPull")]
+        [ShowIf("grabType", DistanceGrabType.Velocity)]
         public float rotationSpeed = 1;
         
         [AutoToggleHeader("Enable Highlighting")]
@@ -72,11 +78,12 @@ namespace Autohand{
 
         private void Start() {
             grabbable = GetComponent<Grabbable>();
+            grabbable.OnGrabEvent += (Hand hand, Grabbable grab) => { gravitationEnabled = false; };
             body = grabbable.body;
         }
     
         void FixedUpdate(){
-            if(!instantPull){
+            if(!instantPull && grabType == DistanceGrabType.Velocity) {
                 if (target == null)
                     return;
 
@@ -85,7 +92,7 @@ namespace Autohand{
                     FollowHandRotation();
                 if (gravitationEnabled)
                     GravitateTowardsHand();
-                timePassedSincePull += Time.deltaTime;
+                timePassedSincePull += Time.fixedDeltaTime;
             }
         }
 
@@ -125,7 +132,7 @@ namespace Autohand{
         }
 
         private void OnCollisionEnter(Collision collision){
-            if (timePassedSincePull > 0.5f)
+            if (timePassedSincePull > 0.2f)
             {
                 pullStarted = false;
                 gravitationEnabled = false;

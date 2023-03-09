@@ -15,7 +15,7 @@ namespace Autohand {
         [Tooltip("You want this set so the disc gizmo is around the axis you want the hand to rotate, or that the line is straight through the axis you want to move")]
         public Vector3 up = Vector3.up;
         [Space, Tooltip("Whether or not to automatically allow for the opposite direction pose to be automatically applied (I.E. Should I be able to grab my hammer only with the head facing up, or in both directions?)")]
-        public bool useInvertPose = true;
+        public bool useInvertPose = false;
 
         [Space]
         [Tooltip("The minimum angle rotation around the included directions")]
@@ -43,6 +43,7 @@ namespace Autohand {
         Transform tempContainer;
         Transform handMatch;
         Transform getTransform;
+
 
         protected override void Awake() {
             base.Awake();
@@ -113,12 +114,14 @@ namespace Autohand {
             tempContainer.rotation = getTransform.rotation;
             Quaternion closestRotation = tempContainer.rotation;
 
-            if(minAngle != 0 || maxAngle != 0 || addInverse)
-            {
+            //if((minAngle != 0 || maxAngle != 0 || addInverse) && !(minAngle == maxAngle))
+           // {
                 float closestDistance = float.MaxValue;
                 float closestIndex = 0;
 
                 var iteration = (Mathf.Abs(minAngle) + Mathf.Abs(maxAngle))/10f;
+                if(iteration == 0)
+                    iteration = 1;
                 var additionalDirection = Vector3.zero;
                 if(up.x != 0)
                     additionalDirection = new Vector3(0, 1, 0);
@@ -141,28 +144,9 @@ namespace Autohand {
                     }
                 }
 
-                if(addInverse) {
-                    for(float i = minAngle; i <= maxAngle; i += iteration) {
-                        tempContainer.eulerAngles = getTransform.rotation * up;
-                        tempContainer.RotateAround(getTransform.position, getTransform.rotation * up, i);
-                        tempContainer.RotateAround(getTransform.position, getTransform.rotation * additionalDirection, 180);
-
-
-                        var distance = Vector3.Distance(handMatch.position, pregrabPos);
-                        distance += Quaternion.Angle(handMatch.rotation, pregrabRot)/180f;
-                        if(distance < closestDistance) {
-                            closestDistance = distance;
-                            closestRotation = tempContainer.rotation;
-                            closestIndex = i;
-                        }
-                    }
-                }
-
                 for (float i = -iteration/2; i < iteration/2; i += iteration/10f) {
                     tempContainer.eulerAngles = getTransform.rotation * up;
                     tempContainer.RotateAround(getTransform.position, getTransform.rotation * up, closestIndex + i);
-                    if (addInverse)
-                        tempContainer.RotateAround(getTransform.position, getTransform.rotation * additionalDirection, 180);
 
                     var distance = Vector3.Distance(handMatch.position, pregrabPos);
                     distance += Quaternion.Angle(handMatch.rotation, pregrabRot)/180f;
@@ -172,7 +156,43 @@ namespace Autohand {
                         closestIndex = i;
                     }
                 }
-            }
+
+                if(addInverse) {
+                    var closestInverseDistance = float.MaxValue;
+                    float closestInverseIndex = 0;
+                    for(float i = minAngle; i <= maxAngle; i += iteration) {
+                        tempContainer.eulerAngles = getTransform.rotation * up;
+                        tempContainer.RotateAround(getTransform.position, getTransform.rotation * up, i);
+                        tempContainer.RotateAround(getTransform.position, getTransform.rotation * additionalDirection, 180);
+
+
+                        var distance = Vector3.Distance(handMatch.position, pregrabPos);
+                        distance += Quaternion.Angle(handMatch.rotation, pregrabRot)/180f;
+                        if(distance < closestInverseDistance) {
+                            closestInverseDistance = distance; 
+                            if(closestInverseDistance < closestDistance)
+                                closestRotation = tempContainer.rotation;
+                            closestInverseIndex = i;
+                        }
+                    }
+
+                    for(float i = -iteration / 2; i < iteration / 2; i += iteration / 10f) {
+                        tempContainer.eulerAngles = getTransform.rotation * up;
+                        tempContainer.RotateAround(getTransform.position, getTransform.rotation * up, closestInverseIndex + i);
+                        tempContainer.RotateAround(getTransform.position, getTransform.rotation * additionalDirection, 180);
+
+                        var distance = Vector3.Distance(handMatch.position, pregrabPos);
+                        distance += Quaternion.Angle(handMatch.rotation, pregrabRot) / 180f;
+                        if(distance < closestInverseDistance) {
+                            closestInverseDistance = distance;
+                            if(closestInverseDistance < closestDistance)
+                                closestRotation = tempContainer.rotation;
+                            closestInverseIndex = i;
+                        }
+                    }
+                }
+
+            //}
 
             return closestRotation;
         }

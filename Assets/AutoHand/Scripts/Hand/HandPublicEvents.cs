@@ -6,12 +6,14 @@ using UnityEngine.Events;
 namespace Autohand {
     public class HandPublicEvents : MonoBehaviour {
         public Hand hand;
-        public UnityHandGrabEvent OnBeforeGrab;
-        public UnityHandGrabEvent OnGrab;
-        public UnityHandGrabEvent OnRelease;
-        public UnityHandGrabEvent OnForceRelease;
-        public UnityHandGrabEvent OnSqueeze;
-        public UnityHandGrabEvent OnUnsqueeze;
+        public UnityHandGrabEvent OnBeforeGrab = new UnityHandGrabEvent();
+        public UnityHandGrabEvent OnGrab = new UnityHandGrabEvent();
+        public UnityHandGrabEvent OnRelease = new UnityHandGrabEvent();
+        public UnityHandGrabEvent OnForceRelease = new UnityHandGrabEvent();
+        public UnityHandGrabEvent OnSqueeze = new UnityHandGrabEvent();
+        public UnityHandGrabEvent OnUnsqueeze = new UnityHandGrabEvent();
+        public UnityHandGrabEvent OnHighlight = new UnityHandGrabEvent();
+        public UnityHandGrabEvent OnStopHighlight = new UnityHandGrabEvent();
 
 
         void OnEnable() {
@@ -20,6 +22,8 @@ namespace Autohand {
             hand.OnReleased += OnReleaseEvent;
             hand.OnSqueezed += OnSqueezeEvent;
             hand.OnUnsqueezed += OnUnsqueezeEvent;
+            hand.OnHighlight += OnHighlightEvent;
+            hand.OnStopHighlight += OnStopHighlightEvent;
         }
 
         void OnDisable() {
@@ -28,6 +32,8 @@ namespace Autohand {
             hand.OnReleased -= OnReleaseEvent;
             hand.OnSqueezed -= OnSqueezeEvent;
             hand.OnUnsqueezed -= OnUnsqueezeEvent;
+            hand.OnHighlight -= OnHighlightEvent;
+            hand.OnStopHighlight -= OnStopHighlightEvent;
         }
 
         public void OnBeforeGrabEvent(Hand hand, Grabbable grab) {
@@ -48,6 +54,13 @@ namespace Autohand {
 
         public void OnUnsqueezeEvent(Hand hand, Grabbable grab) {
             OnUnsqueeze?.Invoke(hand, grab);
+        }
+        public void OnHighlightEvent(Hand hand, Grabbable grab) {
+            OnHighlight?.Invoke(hand, grab);
+        }
+
+        public void OnStopHighlightEvent(Hand hand, Grabbable grab) {
+            OnStopHighlight?.Invoke(hand, grab);
         }
 
         public void OnForceReleaseEvent(Hand hand, Grabbable grab) {

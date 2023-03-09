@@ -7,7 +7,7 @@ namespace Autohand {
     public delegate void StabEvent(Stabber stabber, Stabbable stab);
 
     public class Stabber : MonoBehaviour {
-        [Tooltip("Can be left null")]
+        [Tooltip("Can be left empty/null")]
         public Grabbable grabbable;
         [Header("Stab Settings")]
         public CapsuleCollider stabCapsule;
@@ -15,7 +15,8 @@ namespace Autohand {
         public LayerMask stabbableLayers;
         [Tooltip("The index that must match the stabbables index to allow stabbing")]
         public int stabIndex;
-        public int maxStabs = 10;
+        public int maxStabs = 3;
+
 
         [Header("Joint Settings")]
         public Vector3 axis;
@@ -75,6 +76,7 @@ namespace Autohand {
             StartCoroutine(StartWait());
         }
 
+
         //This will keep the stabbables in place for the start stab
         IEnumerator StartWait() {
             for(int i = 0; i < STABFRAMES; i++) {
@@ -129,7 +131,7 @@ namespace Autohand {
 
             point1 = stabCapsule.bounds.center + stabCapsule.transform.rotation * capsuleAxis * (height);
             point2 = stabCapsule.bounds.center - stabCapsule.transform.rotation * capsuleAxis * (height);
-            Physics.OverlapCapsuleNonAlloc(point1, point2, radius, resultsNonAlloc, stabbableLayers);
+            Physics.OverlapCapsuleNonAlloc(point1, point2, radius, resultsNonAlloc, stabbableLayers, QueryTriggerInteraction.Ignore);
 
             List<Stabbable> newStabbed = new List<Stabbable>();
 

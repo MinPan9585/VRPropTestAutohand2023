@@ -86,7 +86,7 @@ namespace Autohand {
         protected virtual void OnCollisionEnter(Collision collision) {
             if(!disableCollisionTracking) {
                 if(!collisionObjects.Contains(collision.collider.gameObject)) {
-                    OnCollisionFirstEnter?.Invoke(collision.gameObject);
+                    OnCollisionFirstEnter?.Invoke(collision.collider.gameObject);
                     collisionObjects.Add(collision.collider.gameObject);
                     collisionObjectsCount.Add(1);
                 }
@@ -100,7 +100,7 @@ namespace Autohand {
                     var index = collisionObjects.IndexOf(collision.collider.gameObject);
                     var count = --collisionObjectsCount[index];
                     if(count == 0) {
-                        OnCollisionLastExit?.Invoke(collision.gameObject);
+                        OnCollisionLastExit?.Invoke(collision.collider.gameObject);
 
                         collisionObjectsCount.RemoveAt(index);
                         collisionObjects.Remove(collision.collider.gameObject);

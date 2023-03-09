@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Autohand {
-    [RequireComponent(typeof(Rigidbody)), DefaultExecutionOrder(1)]
+    [DefaultExecutionOrder(1)]
     public class WeightlessFollower : MonoBehaviour {
         [HideInInspector]
         public Transform follow;
@@ -79,13 +79,13 @@ namespace Autohand {
                 startAngleDrag = body.angularDrag;
             }
 
+            body.drag = hand.body.drag;
+            body.angularDrag = hand.body.angularDrag;
+
             if(follow == null)
                 follow = heldMoveTo[hand];
             else if(follow1 == null)
                 follow1 = heldMoveTo[hand];
-
-            body.drag = hand.body.drag;
-            body.angularDrag = hand.body.angularDrag;
 
             followPositionStrength = hand.followPositionStrength;
             followRotationStrength = hand.followRotationStrength;
@@ -103,7 +103,18 @@ namespace Autohand {
         }
 
 
+
         public virtual void FixedUpdate() {
+            if(follow == null)
+                return;
+
+            //Calls physics movements
+            MoveTo();
+            TorqueTo();
+        }
+
+
+        protected void SetMoveTo() {
             if(follow == null)
                 return;
 
@@ -116,31 +127,27 @@ namespace Autohand {
                 moveTo.position = follow.position;
                 moveTo.rotation = follow.rotation;
             }
-
-            //Calls physics movements
-            MoveTo();
-            TorqueTo();
         }
 
 
         /// <summary>Moves the hand to the controller position using physics movement</summary>
         protected virtual void MoveTo() {
-            if(followPositionStrength <= 0)
+            if(followPositionStrength <= 0 || body == null)
                 return;
+
+            SetMoveTo();
 
             var movePos = moveTo.position;
             var distance = Vector3.Distance(movePos, transform.position);
 
             if(grab.collisionTracker.collisionCount > 0) {
-                distance = Mathf.Clamp(distance, 0, 0.25f);
-
                 var velocityClamp = maxVelocity;
                 Vector3 vel = (movePos - transform.position).normalized * followPositionStrength * distance;
                 vel.x = Mathf.Clamp(vel.x, -velocityClamp, velocityClamp);
                 vel.y = Mathf.Clamp(vel.y, -velocityClamp, velocityClamp);
                 vel.z = Mathf.Clamp(vel.z, -velocityClamp, velocityClamp);
 
-                body.velocity = Vector3.MoveTowards(body.velocity, vel, 0.25f + body.velocity.magnitude / (velocityClamp * 2));
+                body.velocity = Vector3.MoveTowards(body.velocity, vel, 0.5f + body.velocity.magnitude / (velocityClamp));
             }
             else {
                 var velocityClamp = maxVelocity;
@@ -154,36 +161,29 @@ namespace Autohand {
 
         /// <summary>Rotates the hand to the controller rotation using physics movement</summary>
         protected virtual void TorqueTo() {
-            if(grab.collisionTracker.collisionCount > 0) {
-                var delta = (moveTo.rotation * Quaternion.Inverse(body.rotation));
-                delta.ToAngleAxis(out float angle, out Vector3 axis);
-                if(float.IsInfinity(axis.x))
-                    return;
+            if(body == null)
+                return;
 
-                if(angle > 180f)
-                    angle -= 360f;
+            var delta = (moveTo.rotation * Quaternion.Inverse(body.rotation));
+            delta.ToAngleAxis(out float angle, out Vector3 axis);
+            if(float.IsInfinity(axis.x))
+                return;
 
-                Vector3 angular = (Mathf.Deg2Rad * angle * followRotationStrength) * axis.normalized;
+            if(angle > 180f)
+                angle -= 360f;
 
-                body.angularVelocity = Vector3.Lerp(body.angularVelocity, angular, 0.25f);
+            Vector3 angular = (Mathf.Deg2Rad * angle * followRotationStrength) * axis.normalized;
 
-            }
-            else {
-                var delta = (moveTo.rotation * Quaternion.Inverse(body.rotation));
-                delta.ToAngleAxis(out float angle, out Vector3 axis);
-                if(float.IsInfinity(axis.x))
-                    return;
-
-                if(angle > 180f)
-                    angle -= 360f;
-
-                Vector3 angular = (Mathf.Deg2Rad * angle * followRotationStrength) * axis.normalized;
-
-                //body.angularVelocity = angular;
+            if(CollisionCount() > 0)
+                body.angularVelocity = Vector3.Lerp(body.angularVelocity, angular, 0.5f);
+            else
                 body.angularVelocity = Vector3.Lerp(body.angularVelocity, angular, 0.95f);
-            }
         }
 
+
+        int CollisionCount() {
+            return grab.CollisionCount();
+        }
 
         public void RemoveFollow(Hand hand, Transform follow) {
             hand.OnReleased -= (Hand hand1, Grabbable grab1) => { RemoveFollow(hand1, heldMoveTo[hand1]); };
@@ -208,13 +208,18 @@ namespace Autohand {
             }
         }
 
-        private void OnDestroy() {
-            body.mass = startMass;
-            body.drag = startDrag;
-            body.angularDrag = startAngleDrag;
+        private void OnDestroy()
+        {
             Destroy(moveTo.gameObject);
             foreach(var transform in heldMoveTo)
                 Destroy(transform.Value.gameObject);
+
+            if (body != null)
+            {
+                body.mass = startMass;
+                body.drag = startDrag;
+                body.angularDrag = startAngleDrag;
+            }
         }
     }
 

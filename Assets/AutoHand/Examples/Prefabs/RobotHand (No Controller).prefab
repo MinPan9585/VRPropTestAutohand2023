@@ -310,6 +310,7 @@ SkinnedMeshRenderer:
   m_CastShadows: 2
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -1121,6 +1122,7 @@ SkinnedMeshRenderer:
   m_CastShadows: 2
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -1296,8 +1298,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7348704315564051146}
-  m_LocalRotation: {x: -0.0000072037797, y: -0.0000022402965, z: -0.0000032116654,
-    w: 1}
+  m_LocalRotation: {x: -0.0000072037797, y: -0.0000022402965, z: -0.0000032116654, w: 1}
   m_LocalPosition: {x: -0.0177, y: -0.0016, z: 0.0013}
   m_LocalScale: {x: 1.0000001, y: 1.0000001, z: 1}
   m_Children: []
@@ -1486,8 +1487,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8149646956712602908}
-  m_LocalRotation: {x: -0.0000061402106, y: -0.0000049649398, z: 0.0000024675394,
-    w: 1}
+  m_LocalRotation: {x: -0.0000061402106, y: -0.0000049649398, z: 0.0000024675394, w: 1}
   m_LocalPosition: {x: -0.014, y: 0.0027, z: 0.0001}
   m_LocalScale: {x: 0.9999999, y: 0.99999994, z: 0.99999994}
   m_Children: []
@@ -1606,6 +1606,7 @@ GameObject:
   - component: {fileID: 8904729553806191643}
   - component: {fileID: 165222652473334800}
   - component: {fileID: 2327616046188920004}
+  - component: {fileID: 4231192272129118083}
   m_Layer: 0
   m_Name: RobotHand (No Controller)
   m_TagString: Untagged
@@ -1668,15 +1669,14 @@ MonoBehaviour:
   - {fileID: 5460294669156321847}
   palmTransform: {fileID: 4455591788450219018}
   left: 0
-  reachDistance: 0.2
-  grabTime: 0.15
+  reachDistance: 0.3
   enableMovement: 1
   follow: {fileID: 0}
   maxFollowDistance: 0.5
-  throwPower: 1.5
+  throwPower: 1
   advancedFollowSettings: 1
   enableIK: 1
-  swayStrength: 0.8
+  swayStrength: 0.7
   gripOffset: 0.14
   usingPoseAreas: 1
   queryTriggerInteraction: 0
@@ -1687,6 +1687,8 @@ MonoBehaviour:
   defaultHighlight: {fileID: 0}
   showAdvanced: 1
   grabType: 0
+  minGrabTime: 0.15
+  maxGrabTime: 0.3
   grabCurve:
     serializedVersion: 2
     m_Curve:
@@ -1702,8 +1704,8 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 2
-      outSlope: 2
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -1711,6 +1713,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  smoothReturnSpeed: 1
   poseIndex: 0
   ignoreMe1: 0
 --- !u!114 &8904729553806191643
@@ -1793,6 +1796,12 @@ MonoBehaviour:
   OnUnsqueeze:
     m_PersistentCalls:
       m_Calls: []
+  OnHighlight:
+    m_PersistentCalls:
+      m_Calls: []
+  OnStopHighlight:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!135 &2327616046188920004
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1806,6 +1815,73 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.15
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4231192272129118083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8685472768745978638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 102143406c4b41c46b4c86959873f5c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collisionTriggers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  hapticAmp: 0.5
+  velocityAmp: 0.25
+  repeatDelay: 0.2
+  maxDuration: 0.25
+  velocityAmpCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  velocityDurationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &8783913793033214316
 GameObject:
   m_ObjectHideFlags: 0

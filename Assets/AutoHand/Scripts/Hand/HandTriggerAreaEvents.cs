@@ -99,7 +99,8 @@ namespace Autohand{
 
                     //If there is another hand, it enters
                     if(hands.Count > 1)
-                        HandEnterEvent?.Invoke(hand);
+                        HandEnterEvent?.Invoke(hands[1]);
+
                 }
                 else if(!oneHanded){
                     HandExitEvent?.Invoke(hand);
@@ -111,6 +112,7 @@ namespace Autohand{
                         HandUnsqueezeEvent?.Invoke(hand);
                         squeezing = false;
                     }
+
                 }
 
                 hands.Remove(hand);

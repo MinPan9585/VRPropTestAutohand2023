@@ -6,9 +6,10 @@ using System.Collections.Generic;
 using UnityEditor;
 #endif
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Autohand {
-    [HelpURL("https://earnestrobot.notion.site/Hand-967e36c2ab2945b2b0f75cea84624b2f")]
+    [HelpURL("https://earnestrobot.notion.site/Hand-967e36c2ab2945b2b0f75cea84624b2f"), DefaultExecutionOrder(-10)]
     public class Hand : HandBase {
 
 
@@ -33,14 +34,19 @@ namespace Autohand {
         public GrabType grabType = GrabType.HandToGrabbable;
 
         [ShowIf("showAdvanced")]
+        [Tooltip("Makes grab smoother; also based on range and reach distance - a very near grab is minGrabTime and a max distance grab is maxGrabTime"), Min(0)]
+        public float minGrabTime = 0.1f;
+        [ShowIf("showAdvanced")]
+        [Tooltip("Makes grab smoother; also based on range and reach distance - a very near grab is minGrabTime and a max distance grab is maxGrabTime"), Min(0)]
+        public float maxGrabTime = 0.25f;
+
+        [ShowIf("showAdvanced")]
         [Tooltip("The animation curve based on the grab time 0-1"), Min(0)]
         public AnimationCurve grabCurve;
 
         [ShowIf("showAdvanced")]
-        [Tooltip("Whether or not the hands return on grab should only move when the controller follow moves")]
-        public bool useSmoothReturn = false;
-        [Tooltip("The hand with return X:1 based on controller movement")]
-        public float smoothReturnSpeed = 1;
+        [Tooltip("Speed at which the gentle grab returns the grabbable"), Min(0)][FormerlySerializedAs("smoothReturnSpeed")]
+        public float gentleGrabSpeed = 1;
 
         [ShowIf("showAdvanced")]
         [Tooltip("This is used in conjunction with custom poses. For a custom pose to work it must has the same PoseIndex as the hand. Used for when your game has multiple hands")]
@@ -48,6 +54,7 @@ namespace Autohand {
 
         [AutoLine]
         public bool ignoreMe1;
+
 
 
 
@@ -111,6 +118,9 @@ namespace Autohand {
 
         Coroutine tryGrab;
         Coroutine highlightRoutine;
+        float startGrabDist;
+        HandPoseData openHandPose;
+        Grabbable lastHoldingObj;
 
         Coroutine _grabRoutine;
         Coroutine grabRoutine {
@@ -132,39 +142,46 @@ namespace Autohand {
 
 
         protected override void Awake() {
-            if(highlightLayers == 0)
+            if(highlightLayers == 0) {
                 highlightLayers = LayerMask.GetMask(grabbableLayerNameDefault);
+            }
 
             handLayers = LayerMask.GetMask(rightHandLayerName, leftHandLayerName);
-
+            
             base.Awake();
 
             if(enableMovement) {
                 body.drag = 10;
-                body.angularDrag = 35;
+                body.angularDrag = 38;
                 body.useGravity = false;
             }
 
 
+
+            SetLayer();
+            base.Awake();
+        }
+
+
+        private void Start()
+        {
+
 #if UNITY_EDITOR
-            if(Selection.activeGameObject == gameObject) {
+            if (Selection.activeGameObject == gameObject)
+            {
                 Selection.activeGameObject = null;
-                Debug.Log("Auto Hand: Selecting the grabbable can cause lag and quality reduction at runtime. (Automatically deselecting at runtime) Remove this code at any time.", this);
+                Debug.Log("Auto Hand: highlighting hand component in the inspector can cause lag and quality reduction at runtime in VR. (Automatically deselecting at runtime) Remove this code at any time.", this);
                 editorSelected = true;
             }
 
-            Application.quitting += () => { if(editorSelected) Selection.activeGameObject = gameObject; };
+            Application.quitting += () => { if (editorSelected && Selection.activeGameObject == null) Selection.activeGameObject = gameObject; };
 #endif
         }
 
-        protected override void Start() {
-            base.Start();
-            SetLayer();
-            highlightRoutine = StartCoroutine(HighlightUpdate(Time.fixedUnscaledDeltaTime * 4f));
-        }
 
         protected override void OnEnable() {
             base.OnEnable();
+            highlightRoutine = StartCoroutine(HighlightUpdate(Time.fixedUnscaledDeltaTime*4));
             collisionTracker.OnCollisionFirstEnter += OnCollisionFirstEnter;
             collisionTracker.OnCollisionLastExit += OnCollisionLastExit;
             collisionTracker.OnTriggerFirstEnter += OnTriggerFirstEnter;
@@ -174,6 +191,7 @@ namespace Autohand {
             collisionTracker.OnCollisionLastExit += (collision) => { OnHandCollisionStop?.Invoke(this, collision); };
             collisionTracker.OnTriggerFirstEnter += (collision) => { OnHandTriggerStart?.Invoke(this, collision); };
             collisionTracker.OnTriggeLastExit += (collision) => { OnHandTriggerStop?.Invoke(this, collision); };
+
         }
 
         protected override void OnDisable() {
@@ -184,31 +202,47 @@ namespace Autohand {
                 StopCoroutine(tryGrab);
             if(highlightRoutine != null)
                 StopCoroutine(highlightRoutine);
+
             base.OnDisable();
+            collisionTracker.OnCollisionFirstEnter -= OnCollisionFirstEnter;
+            collisionTracker.OnCollisionLastExit -= OnCollisionLastExit;
+            collisionTracker.OnTriggerFirstEnter -= OnTriggerFirstEnter;
+            collisionTracker.OnTriggeLastExit -= OnTriggerLastExit;
+
+            collisionTracker.OnCollisionFirstEnter -= (collision) => { OnHandCollisionStart?.Invoke(this, collision); };
+            collisionTracker.OnCollisionLastExit -= (collision) => { OnHandCollisionStop?.Invoke(this, collision); };
+            collisionTracker.OnTriggerFirstEnter -= (collision) => { OnHandTriggerStart?.Invoke(this, collision); };
+            collisionTracker.OnTriggeLastExit -= (collision) => { OnHandTriggerStop?.Invoke(this, collision); };
         }
 
 
-        protected virtual void Update() {
-
-            if(holdingObj && !holdingObj.maintainGrabOffset) {
-                if(useSmoothReturn) {
+        protected override void Update() {
+            if(enableMovement) {
+                if(holdingObj && !holdingObj.maintainGrabOffset && !IsGrabbing()) {
                     var deltaDist = Vector3.Distance(follow.position, lastFrameFollowPos);
                     var deltaRot = Quaternion.Angle(follow.rotation, lastFrameFollowRot);
-                    grabPositionOffset = Vector3.MoveTowards(grabPositionOffset, Vector3.zero, deltaDist * smoothReturnSpeed);
-                    grabRotationOffset = Quaternion.RotateTowards(grabRotationOffset, Quaternion.identity, deltaRot + deltaDist * 90);
-                }
-                else {
-                    grabPositionOffset = Vector3.zero;
-                    grabRotationOffset = Quaternion.identity;
+                    grabPositionOffset = Vector3.MoveTowards(grabPositionOffset, Vector3.zero, (deltaDist) * gentleGrabSpeed * Time.deltaTime * 60f);
+                    grabRotationOffset = Quaternion.RotateTowards(grabRotationOffset, Quaternion.identity, (deltaRot) * gentleGrabSpeed * Time.deltaTime * 60f);
 
+                    if(!holdingObj.useGentleGrab) {
+                        grabPositionOffset = Vector3.MoveTowards(grabPositionOffset, Vector3.zero, Time.deltaTime / GetGrabTime());
+                        grabRotationOffset = Quaternion.RotateTowards(grabRotationOffset, Quaternion.identity, (90f * Time.deltaTime) / GetGrabTime());
+                    }
                 }
+
+                lastFrameFollowPos = follow.position;
+                lastFrameFollowRot = follow.rotation;
             }
-
-
-            lastFrameFollowPos = follow.position;
-            lastFrameFollowRot = follow.rotation;
+            base.Update();
         }
 
+
+        float GetGrabTime() {
+            var distanceDivider = Mathf.Clamp01(startGrabDist / reachDistance);
+            var grabVelocityOffset = holdingObj.body != null ? holdingObj.body.velocity.magnitude * Time.fixedDeltaTime * distanceDivider * 2 : 0f;
+            var handVelocityOffset = body.velocity.magnitude * Time.fixedDeltaTime * distanceDivider * 2;
+            return Mathf.Clamp(minGrabTime + ((maxGrabTime - minGrabTime) * distanceDivider) - grabVelocityOffset - handVelocityOffset, 0, maxGrabTime);
+        }
 
         //================== CORE INTERACTION FUNCTIONS ===================
         //================================================================
@@ -221,15 +255,21 @@ namespace Autohand {
             Grab(grabType);
         }
 
-
         /// <summary>Function for controller trigger fully pressed -> Grabs whatever is directly in front of and closest to the hands palm</summary>
         public virtual void Grab(GrabType grabType) {
             OnTriggerGrab?.Invoke(this, null);
             foreach(var triggerArea in triggerEventAreas) {
                 triggerArea.Grab(this);
             }
+            if(usingHighlight && !grabbing && holdingObj == null && lookingAtObj != null) {
+                var newGrabType = this.grabType;
+                if(lookingAtObj.grabType != HandGrabType.Default)
+                    newGrabType = lookingAtObj.grabType == HandGrabType.GrabbableToHand ? GrabType.GrabbableToHand : GrabType.HandToGrabbable;
+                
+                grabRoutine = StartCoroutine(GrabObject(GetHighlightHit(), lookingAtObj, newGrabType));
+            }
 
-            if(!grabbing && holdingObj == null) {
+            else if(!grabbing && holdingObj == null) {
                 if(HandClosestHit(out RaycastHit closestHit, out Grabbable grabbable, reachDistance, ~handLayers) != Vector3.zero && grabbable != null) {
                     var newGrabType = this.grabType;
                     if(grabbable.grabType != HandGrabType.Default)
@@ -245,70 +285,56 @@ namespace Autohand {
 
         /// <summary>Grabs based on raycast and grab input data</summary>
         public virtual void Grab(RaycastHit hit, Grabbable grab, GrabType grabType = GrabType.InstantGrab) {
-            bool objectFree = grab.body.isKinematic != true && grab.body.constraints == RigidbodyConstraints.None && grab.parentOnGrab;
+            bool objectFree = grab.body.isKinematic != true && grab.body.constraints == RigidbodyConstraints.None;
             if(!grabbing && holdingObj == null && this.CanGrab(grab) && objectFree) {
-
-                var estimatedRadius = Vector3.Distance(hit.point, hit.transform.position);
-                var difference = (grab.transform.position - hit.point) + (palmTransform.forward * estimatedRadius * 2f);
-                var startPos = grab.transform.position;
-                grab.transform.position = palmTransform.position + difference;
-                grab.body.position = grab.transform.position;
-
-                if(HandClosestHit(out RaycastHit closestHit, out Grabbable grabbable, estimatedRadius * 3f, LayerMask.GetMask(LayerMask.LayerToName(grab.gameObject.layer)), grab) != Vector3.zero) {
-                    grabRoutine = StartCoroutine(GrabObject(closestHit, grabbable, grabType));
-                }
-                else if(grab != null) {
-                    grab.transform.position = startPos;
-                    grab.body.position = grab.transform.position;
-                    grabRoutine = StartCoroutine(GrabObject(hit, grab, grabType));
-                }
+                grabRoutine = StartCoroutine(GrabObject(hit, grab, grabType));
             }
         }
 
         /// <summary>Attempts grab on given grabbable</summary>
         public virtual void TryGrab(Grabbable grab) {
-            if(!grabbing && holdingObj == null && this.CanGrab(grab)) {
-                if(tryGrab != null)
-                    StopCoroutine(tryGrab);
-                tryGrab = StartCoroutine(TryGrab());
-            }
 
-            IEnumerator TryGrab() {
-                RaycastHit closestHit;
-                for(int i = 0; i < 5; i++) {
-                    bool grabbed = false;
-                    var distance = Vector3.Distance(palmTransform.position, grab.transform.position);
-                    var mask = LayerMask.GetMask(LayerMask.LayerToName(grab.gameObject.layer));
-                    if(HandClosestHit(out closestHit, out _, distance, mask, grab) != Vector3.zero) {
-                        grabRoutine = StartCoroutine(GrabObject(closestHit, grab, GrabType.InstantGrab));
-                        grabbed = true;
-                        break;
-                    }
-                    else {
-                        RaycastHit[] hits = Physics.RaycastAll(palmTransform.position, grab.transform.position - palmTransform.position, distance * 2, mask);
-                        if(hits.Length > 0) {
-                            foreach(var hit in hits) {
-                                if(!grabbed && hit.transform.gameObject == grab.gameObject) {
-                                    grabRoutine = StartCoroutine(GrabObject(hit, grab, GrabType.InstantGrab));
-                                    grabbed = true;
-                                    break;
-                                }
+            if(!grabbing && holdingObj == null && this.CanGrab(grab)) {
+
+                grab.body.position = palmTransform.position + palmTransform.forward * reachDistance;
+                grab.body.transform.position = grab.body.position;
+
+                var grabLayer = grab.gameObject.layer;
+                var grabbingLayer = LayerMask.NameToLayer(grabbingLayerName);
+                var grabPoint = grab.body.worldCenterOfMass;
+                SetLayerRecursive(grab.transform, grabbingLayer);
+                RaycastHit lastHit = new RaycastHit();
+                bool didHit = false;
+
+                for(int i = 0; i < 3; i++) {
+                    if(!grabbing && holdingObj == null) {
+                        Ray handGrabRay = new Ray(palmTransform.position, (grabPoint - palmTransform.position));
+
+                        if(Physics.SphereCast(handGrabRay.origin - handGrabRay.direction * sphereCastRadius * 10f, sphereCastRadius * 3, handGrabRay.direction.normalized, out var hit, Vector3.Distance(grabPoint, palmTransform.position) * 2 + sphereCastRadius * 10, 1 << grabbingLayer, queryTriggerInteraction)) {
+                            var hitToCenterOfMassDistance = grabPoint - hit.point;
+                            grab.body.position = palmTransform.position - handGrabRay.direction.normalized * reachDistance * 0.5f + hitToCenterOfMassDistance;
+                            grab.body.transform.position = grab.body.position;
+                            lastHit = hit;
+                            didHit = true;
+
+                            if(HandClosestHit(out RaycastHit closestHit, out Grabbable grabbable, reachDistance * 2, 1 << grabbingLayer) != Vector3.zero && grabbable != null) {
+                                SetLayerRecursive(grab.transform, grabLayer);
+                                grabbable.body.velocity = Vector3.zero;
+                                grabbable.body.angularVelocity = Vector3.zero;
+                                grabRoutine = StartCoroutine(GrabObject(closestHit, grabbable, GrabType.InstantGrab));
                             }
                         }
-                    }
 
-                    if(grabbed) break;
-                    yield return new WaitForSeconds(Time.fixedUnscaledDeltaTime * 2);
+                    }
                 }
 
-                tryGrab = null;
+                if(!grabbing && holdingObj == null && didHit) {
+                    Grab(lastHit, grab, GrabType.InstantGrab);
+                }
+
+
             }
         }
-
-        /// <summary>Attempts grab on given grabbable</summary>
-        public virtual void TryGrab(Grabbable grab, bool imforbackwardscompatability) {
-            TryGrab(grab);
-        } 
 
 
         /// <summary>Function for controller trigger unpressed</summary>
@@ -327,6 +353,7 @@ namespace Autohand {
                 holdingObj?.OnRelease(this);
                 OnHeldConnectionBreak?.Invoke(this, holdingObj);
                 OnReleased?.Invoke(this, holdingObj);
+                ignoreMoveFrame = true;
             }
 
             BreakGrabConnection();
@@ -344,6 +371,7 @@ namespace Autohand {
         public virtual void ReleaseGrabLock() {
             ForceReleaseGrab();
         }
+
 
         /// <summary>Event for controller grip</summary>
         public virtual void Squeeze() {
@@ -375,18 +403,28 @@ namespace Autohand {
                     holdingObj.OnUnsqueeze(this);
 
                 if(grabbing) {
-                    holdingObj.body.velocity = Vector3.zero;
-                    holdingObj.body.angularVelocity = Vector3.zero;
+                    if (holdingObj.body != null){
+                        holdingObj.body.velocity = Vector3.zero;
+                        holdingObj.body.angularVelocity = Vector3.zero;
+                    }
                 }
 
                 foreach(var finger in fingers) {
-                    finger.SetFingerBend(finger.GetLastHitBend());
+                    finger.SetCurrentFingerBend(finger.GetLastHitBend());
+                }
+
+                if(holdingObj.ignoreReleaseTime == 0) {
+                    transform.position = holdingObj.body.transform.InverseTransformPoint(startHandGrabPosition);
+                    body.position = transform.position;
                 }
 
                 holdingObj.BreakHandConnection(this);
+                lastHoldingObj = holdingObj;
                 holdingObj = null;
             }
 
+
+            velocityTracker.Disable(throwVelocityExpireTime);
             grabbed = false;
             grabPose = null;
             lookingAtObj = null;
@@ -408,6 +446,7 @@ namespace Autohand {
                 grab.OnBeforeGrab(this);
             }
 
+
             transform.position = handPos;
             body.position = handPos;
             transform.rotation = handRot;
@@ -422,24 +461,21 @@ namespace Autohand {
             grabPoint.transform.position = handPos;
             grabPoint.transform.rotation = handRot;
 
+
             holdingObj = grab;
+
+            grabPosition.transform.position = holdingObj.body.transform.position;
+            grabPosition.transform.rotation = holdingObj.body.transform.rotation;
+
             if(!(holdingObj.grabType == HandGrabType.GrabbableToHand) && !(grabType == GrabType.GrabbableToHand)) {
                 grabPositionOffset = transform.position - follow.transform.position;
                 grabRotationOffset = Quaternion.Inverse(follow.transform.rotation) * transform.rotation;
             }
 
-
             //If it's a predetermined Pose
-            GrabbablePose tempPose = null;
-            if(holdingObj.CanGetComponent(out GrabbablePoseCombiner poseCombiner)) {
+            if(holdingObj.GetSavedPose(out var poseCombiner)) {
                 if(poseCombiner.CanSetPose(this)) {
-                    grabPose = poseCombiner.GetClosestPose(this, holdingObj);
-                    grabPose.SetHandPose(this);
-                }
-            }
-            else if(holdingObj.CanGetComponent(out tempPose)) {
-                if(tempPose.CanSetPose(this)) {
-                    grabPose = tempPose;
+                    grabPose = poseCombiner.GetClosestPose(this);
                     grabPose.SetHandPose(this);
                 }
             }
@@ -471,13 +507,9 @@ namespace Autohand {
         //=============================================================
 
         /// <summary>Manages the highlighting for grabbables</summary>
-        protected virtual void UpdateHighlight() {
-            if(usingHighlight && highlightLayers != 0 && holdingObj == null) {
-                Vector3 dir = Vector3.zero;
-                Grabbable newLookingAtObj = null;
-
-                if(!holdingObj)
-                    dir = HandClosestHit(out highlightHit, out newLookingAtObj, reachDistance, ~handLayers);
+        public virtual void UpdateHighlight() {
+            if(usingHighlight && highlightLayers != 0 && holdingObj == null && !IsGrabbing()) {
+                Vector3 dir = HandClosestHit(out highlightHit, out Grabbable newLookingAtObj, reachDistance, highlightLayers);
 
                 //Zero means it didn't hit
                 if(dir != Vector3.zero && (newLookingAtObj != null && newLookingAtObj.CanGrab(this))) {
@@ -508,7 +540,11 @@ namespace Autohand {
         }
 
         /// <summary>Returns the closest raycast hit from the hand's highlighting system, if no highlight, returns blank raycasthit</summary>
-        public RaycastHit GetHighlightHit() { return highlightHit; }
+        public RaycastHit GetHighlightHit() {
+            highlightHit.point = grabPoint.position;
+            highlightHit.normal = grabPoint.up;
+            return highlightHit; 
+        }
 
 
 
@@ -521,34 +557,55 @@ namespace Autohand {
         public void AutoPose(RaycastHit hit, Grabbable grabbable) {
             var grabbableLayer = grabbable.gameObject.layer;
             var grabbingLayer = LayerMask.NameToLayer(Hand.grabbingLayerName);
-            grabbable.SetLayerRecursive(grabbable.body.transform, grabbingLayer);
+            grabbable.SetLayerRecursive(grabbable.transform, grabbingLayer);
 
             Vector3 palmLocalPos = palmTransform.localPosition;
             Quaternion palmLocalRot = palmTransform.localRotation;
 
-            palmChild.position = transform.position;
-            palmChild.rotation = transform.rotation;
+            for(int i = 0; i < 10; i++)
+                Calculate();
 
-            palmTransform.LookAt(hit.point, palmTransform.up);
+            void Calculate() {
+                Align();
 
-            transform.position = palmChild.position;
-            transform.rotation = palmChild.rotation;
+                var grabDir = hit.point - palmTransform.position;
+                transform.position += grabDir;
+                body.position = transform.position;
 
-            palmTransform.localPosition = palmLocalPos;
-            palmTransform.localRotation = palmLocalRot;
+                palmCollider.enabled = true;
+                if(Physics.ComputePenetration(hit.collider, hit.collider.transform.position, hit.collider.transform.rotation,
+                    palmCollider, palmCollider.transform.position, palmCollider.transform.rotation, out var dir, out var dist)) {
+                    transform.position -= dir * dist / 2f;
+                    body.position = transform.position;
+                }
+                palmCollider.enabled = false;
 
-            transform.RotateAround(palmTransform.position, -palmTransform.right, Vector3.Angle(palmTransform.forward, hit.point - palmTransform.position));
-            transform.RotateAround(palmTransform.position, palmTransform.up, Vector3.Angle(palmTransform.forward, hit.point - palmTransform.position));
-            transform.position += hit.point - palmTransform.position;
-            if(Physics.ComputePenetration(hit.collider, hit.collider.transform.position, hit.collider.transform.rotation,
-                palmCollider, palmTransform.transform.position, palmTransform.transform.rotation, out var dir, out var dist))
-                transform.position -= dir * dist / 2f;
+                Align();
+
+                transform.position -= palmTransform.forward * grabDir.magnitude / 3f;
+                body.position = transform.position;
+            }
+
+            void Align() {
+                palmChild.position = transform.position;
+                palmChild.rotation = transform.rotation;
+
+                palmTransform.LookAt(hit.point, palmTransform.up);
+
+                transform.position = palmChild.position;
+                transform.rotation = palmChild.rotation;
+
+                palmTransform.localPosition = palmLocalPos;
+                palmTransform.localRotation = palmLocalRot;
+            }
 
             foreach(var finger in fingers)
                 finger.BendFingerUntilHit(fingerBendSteps, LayerMask.GetMask(Hand.grabbingLayerName));
 
-            grabbable.SetLayerRecursive(grabbable.body.transform, grabbableLayer);
+            grabbable.SetLayerRecursive(grabbable.transform, grabbableLayer);
+
         }
+
 
         /// <summary>Returns the current hand pose, ignoring what is being held - (IF SAVING A HELD POSE USE GetHeldPose())</summary>
         public HandPoseData GetHandPose() {
@@ -606,15 +663,26 @@ namespace Autohand {
                 handAnimateRoutine = StartCoroutine(LerpHandPose(GetHandPose(), pose, time));
         }
 
+        /// <summary>If the grabbable has a GrabbablePose, this will return it. Null if none</summary>
+        public GrabbablePose GetGrabPose(Transform from, Grabbable grabbable) {
+            GrabbablePose grabPose = null;
+            if(grabbable.GetSavedPose(out var poseCombiner) && poseCombiner.CanSetPose(this)) {
+                grabPose = poseCombiner.GetClosestPose(this);
+                return grabPose;
+            }
+
+            return grabPose;
+        }
+
         /// <summary>If the held grabbable has a GrabbablePose, this will return it. Null if none</summary>
-        public bool GetGrabPose(Transform from, Grabbable grabbable, out GrabbablePose grabPose, out Transform relativeTo) {
-            if(grabbable.GetSavedPose(grabbable.transform, out var poseCombiner) && poseCombiner.CanSetPose(this)) {
-                grabPose = poseCombiner.GetClosestPose(this, grabbable);
+        public bool GetCurrentHeldGrabPose(Transform from, Grabbable grabbable, out GrabbablePose grabPose, out Transform relativeTo) {
+            if(grabbable.GetSavedPose(out var poseCombiner) && poseCombiner.CanSetPose(this)) {
+                grabPose = poseCombiner.GetClosestPose(this);
                 relativeTo = grabbable.transform;
                 return true;
             }
-            if(grabbable.GetSavedPose(from, out var poseCombiner1) && poseCombiner1.CanSetPose(this)) {
-                grabPose = poseCombiner1.GetClosestPose(this, grabbable);
+            if(grabbable.GetSavedPose(out var poseCombiner1) && poseCombiner1.CanSetPose(this)) {
+                grabPose = poseCombiner1.GetClosestPose(this);
                 relativeTo = from;
                 return true;
             }
@@ -623,7 +691,6 @@ namespace Autohand {
             relativeTo = from;
             return false;
         }
-
 
         /// <summary>Returns the current held object - null if empty (Same as GetHeld())</summary>
         public Grabbable GetHeldGrabbable() {
@@ -646,18 +713,17 @@ namespace Autohand {
         //=================================================================
         //=================================================================
 
+        /// <summary>Resets the grab offset created on grab for a smoother hand return</summary>
+        public void ResetGrabOffset() {
 
-        /// <summary>Whether or not this hand can grab the grabbbale based on hand and grabbable settings</summary>
-        public bool CanGrab(Grabbable grab) {
-            var cantHandSwap = (grab.IsHeld() && grab.singleHandOnly && !grab.allowHeldSwapping);
-            return (grab.CanGrab(this) && !grabbing && !cantHandSwap);
+            grabPositionOffset = transform.position - follow.transform.position;
+            grabRotationOffset = Quaternion.Inverse(follow.transform.rotation) * transform.rotation;
         }
 
         /// <summary>Sets the hands grip 0 is open 1 is closed</summary>
         public void SetGrip(float grip) {
             triggerPoint = grip;
         }
-
 
         [ContextMenu("Set Pose - Relax Hand")]
         public void RelaxHand() {
@@ -699,7 +765,7 @@ namespace Autohand {
 
         /// <summary>Plays haptic vibration on the hand controller if supported by controller link</summary>
         public void PlayHapticVibration() {
-            PlayHapticVibration(grabTime, 0.5f);
+            PlayHapticVibration(0.05f, 0.5f);
         }
 
         /// <summary>Plays haptic vibration on the hand controller if supported by controller link</summary>
@@ -719,6 +785,37 @@ namespace Autohand {
         //========================= SAVING FUNCTIONS ======================
         //=================================================================
         //=================================================================
+        public Hand copyFromHand;
+            
+        [Button("Copy Pose"), ContextMenu("COPY POSE")]
+        public void CopyPose()
+        {
+            if (copyFromHand != null)
+            {
+                if (copyFromHand.fingers.Length != fingers.Length)
+                {
+                    Debug.LogError("Cannot copy pose because hand reference does not have the same number of fingers attached as this hand");
+
+                }
+                else
+                {
+                    for (int i = 0; i < copyFromHand.fingers.Length; i++)
+                    {
+#if UNITY_EDITOR
+                        EditorUtility.SetDirty(fingers[i]);
+#endif
+                        fingers[i].CopyPose(copyFromHand.fingers[i]);
+                    }
+                    Debug.Log("Auto Hand: Copied Hand Pose!");
+                }
+
+            }
+            else
+            {
+                Debug.LogError("Cannot copy pose because hand reference to copy from is not set");
+            }
+        }
+
 
         [Button("Save Open Pose"), ContextMenu("SAVE OPEN")]
         public void SaveOpenPose() {
@@ -751,10 +848,10 @@ namespace Autohand {
         //=================================================================
 
 
-
         protected virtual void OnCollisionFirstEnter(GameObject collision) {
-            if(collision.CanGetComponent(out HandTouchEvent touchEvent))
+            if(collision.CanGetComponent(out HandTouchEvent touchEvent)) {
                 touchEvent.Touch(this);
+            }
         }
 
         protected virtual void OnCollisionLastExit(GameObject collision) {
@@ -792,12 +889,17 @@ namespace Autohand {
             }
         }
 
-
+        Vector3 startHandGrabPosition;
         /// <summary>Takes a hit from a grabbable object and moves the hand towards that point, then calculates ideal hand shape</summary>
         protected IEnumerator GrabObject(RaycastHit hit, Grabbable grab, GrabType grabType) {
             //Checks if the grabbable script is enabled
-            if(!this.CanGrab(grab))
+            if(!CanGrab(grab))
                 yield break;
+
+            //SETS GRAB POINT
+            grabPoint.parent = hit.collider.transform;
+            grabPoint.position = hit.point;
+            grabPoint.up = hit.normal;
 
             while(grab.beingGrabbed)
                 yield return new WaitForEndOfFrame();
@@ -806,124 +908,185 @@ namespace Autohand {
             CancelPose();
             ClearPoseArea();
 
+
             grabPose = null;
             grabbing = true;
             holdingObj = grab;
             lookingAtObj = null;
             var instantGrab = holdingObj.instantGrab || grabType == GrabType.InstantGrab;
             var startHoldingObj = holdingObj;
+            body.velocity = Vector3.zero;
+            body.angularVelocity = Vector3.zero;
 
             foreach(var collider in holdingObj.heldIgnoreColliders)
                 HandIgnoreCollider(collider, true);
 
-
-            //Hand Swap - One Handed Items
-            if(grab.singleHandOnly && grab.HeldCount() > 0 && grabType == GrabType.GrabbableToHand) {
-                grab.ForceHandRelease(grab.GetHeldBy()[0]);
-                yield return new WaitForFixedUpdate();
-            }
-
-            holdingObj.OnBeforeGrab(this);
-            if(holdingObj == null) {
-                CancelGrab();
-                yield break;
-            }
-
             OnBeforeGrabbed?.Invoke(this, holdingObj);
+            holdingObj.OnBeforeGrab(this);
+
+            startHandGrabPosition = holdingObj.transform.InverseTransformPoint(transform.position);
+
             if(holdingObj == null) {
                 CancelGrab();
                 yield break;
             }
 
 
-
-            //SETS GRAB POINT
-            grabPoint.parent = hit.transform;
-            grabPoint.position = hit.point;
             //Sets Pose
             HandPoseData startGrabPose;
-            Transform poseRelativeTo;
-            startGrabPose = new HandPoseData(this, holdingObj);
-            float startGrabDist = Vector3.Distance(palmTransform.position, grabPoint.position);
-            startGrabDist = Mathf.Clamp(startGrabDist, reachDistance / 3f, reachDistance);
 
             var startGrabbablePosition = holdingObj.transform.position;
             var startGrabbableRotation = holdingObj.transform.rotation;
+            startGrabDist = Vector3.Distance(palmTransform.position, grabPoint.position);
 
-            if(GetGrabPose(hit.collider.transform, holdingObj, out grabPose, out poseRelativeTo)) {
-                if(holdingObj.transform != poseRelativeTo.transform)
-                    startGrabPose = new HandPoseData(this, holdingObj);
+            if(grabPose = GetGrabPose(hit.collider.transform, holdingObj)) {
+                startGrabPose = new HandPoseData(this, grabPose.transform);
             }
             else {
                 startGrabPose = new HandPoseData(this, grabPoint);
-                transform.position -= palmTransform.forward * 0.1f;
+                transform.position -= palmTransform.forward * 0.08f;
+                body.position = transform.position;
+                hit.point = grabPoint.position;
+                hit.normal = grabPoint.up;
                 AutoPose(hit, holdingObj);
             }
 
-            //Smooth Grabbing
-            if(grabTime > 0 && !instantGrab) {
-                Transform grabTarget = grabPose != null ? poseRelativeTo : grabPoint;
-                HandPoseData postGrabPose = grabPose == null ? new HandPoseData(this, grabPoint) : grabPose.GetHandPoseData(this);
-                var adjustedGrabTime = grabTime * (startGrabDist / reachDistance);
+            var adjustedGrabTime = GetGrabTime();
+            instantGrab = instantGrab || adjustedGrabTime == 0;
 
-                if(grabType == GrabType.HandToGrabbable || (grabType == GrabType.GrabbableToHand && !holdingObj.parentOnGrab)) {
+            if(grabType == GrabType.GrabbableToHand) {
+                //Hand Swap - One Handed Items
+                if(holdingObj.singleHandOnly && holdingObj.HeldCount() > 0) {
+                    holdingObj.ForceHandRelease(holdingObj.GetHeldBy()[0]);
+                }
+            }
+
+                //Smooth Grabbing
+            if(!instantGrab) {
+                Transform grabTarget = grabPose != null ? grabPose.transform : grabPoint;
+                HandPoseData postGrabPose = grabPose == null ? new HandPoseData(this, grabPoint) : grabPose.GetHandPoseData(this);
+                var endGrabbablePosition = transform.InverseTransformPoint(holdingObj.transform.position);
+                var endGrabbableRotation = Quaternion.Inverse(palmTransform.transform.rotation) * holdingObj.transform.rotation;
+
+                foreach(var finger in fingers)
+                    finger.SetFingerBend(gripOffset + Mathf.Clamp01(finger.GetCurrentBend()/4f));
+                openHandPose = GetHandPose();
+
+                if(grabType == GrabType.HandToGrabbable || (grabType == GrabType.GrabbableToHand && (holdingObj.HeldCount() > 0 || !holdingObj.parentOnGrab))) {
                     for(float i = 0; i < adjustedGrabTime; i += Time.deltaTime) {
                         if(holdingObj != null) {
-                            var point = i / adjustedGrabTime;
-                            HandPoseData.LerpPose(startGrabPose, postGrabPose, grabCurve.Evaluate(point)).SetPose(this, grabTarget);
+                            i += holdingObj.GetVelocity().magnitude * Time.deltaTime * 5;
+                            i += followVel.magnitude * Time.deltaTime * 7;
+                            if(i < adjustedGrabTime) {
+                                var point = Mathf.Clamp01(i / adjustedGrabTime);
+                                var handOpenTime = 0.5f;
+                                var handTargetTime = 1.5f;
 
-                            holdingObj.body.angularVelocity *= 1 - (Time.deltaTime * 10);
+                                if(point < handOpenTime)
+                                    HandPoseData.LerpPose(startGrabPose, openHandPose, grabCurve.Evaluate(point * 1f / handOpenTime)).SetFingerPose(this, grabTarget);
+                                else
+                                    HandPoseData.LerpPose(openHandPose, postGrabPose, grabCurve.Evaluate((point - handOpenTime) * (1f / (1 - handOpenTime)))).SetFingerPose(this, grabTarget);
+
+                                HandPoseData.LerpPose(startGrabPose, postGrabPose, point * handTargetTime).SetPosition(this, grabTarget);
+                                body.position = transform.position;
+                                body.rotation = transform.rotation;
+
+                                if(holdingObj.body != null)
+                                    holdingObj.body.angularVelocity *= 0.5f;
+                                yield return new WaitForEndOfFrame();
+                            }
+                        }
+                    }
+
+                    //Hand Swap - One Handed Items
+                    if (holdingObj != null && holdingObj.singleHandOnly && holdingObj.HeldCount() > 0)
+                    {
+                        holdingObj.ForceHandRelease(holdingObj.GetHeldBy()[0]);
+                        if (holdingObj.body != null)
+                        {
                             holdingObj.body.velocity = Vector3.zero;
-                            body.velocity = Vector3.zero;
-                            body.angularVelocity = Vector3.zero;
-                            yield return new WaitForEndOfFrame();
+                            holdingObj.body.angularVelocity = Vector3.zero;
                         }
                     }
                 }
-                else if(grabType == GrabType.GrabbableToHand) {
-                    bool useGravity = holdingObj.body.useGravity;
-                    holdingObj.body.useGravity = false;
-                    SetMoveTo();
-                    SetHandLocation(moveTo.position, moveTo.rotation);
-                    postGrabPose.SetPose(this, grabTarget);
+                else if(grabType == GrabType.GrabbableToHand)
+                {
+                    holdingObj.ActivateRigidbody();
 
+                    bool useGravity = true;
+                    if (holdingObj.body != null)
+                    {
+                        useGravity = holdingObj.body.useGravity;
+                        holdingObj.body.useGravity = false;
+                    }
                     for(float i = 0; i < adjustedGrabTime; i += Time.deltaTime) {
                         if(holdingObj != null) {
-                            var point = i / adjustedGrabTime;
-                            holdingObj.body.velocity = Vector3.zero;
-                            holdingObj.body.angularVelocity = Vector3.zero;
+                            var point = Mathf.Clamp01(i / adjustedGrabTime);
+                            var handOpenTime = 0.5f;
 
-                            HandPoseData.LerpPose(startGrabPose, postGrabPose, grabCurve.Evaluate(point)).SetPose(this, grabTarget);
+                            if(point < handOpenTime)
+                                HandPoseData.LerpPose(startGrabPose, openHandPose, grabCurve.Evaluate(point * 1f / handOpenTime)).SetFingerPose(this, grabTarget);
+                            
+                            else
+                                HandPoseData.LerpPose(openHandPose, postGrabPose, grabCurve.Evaluate((point - handOpenTime) * (1f / (1 - handOpenTime)))).SetFingerPose(this, grabTarget);
 
                             SetMoveTo();
                             SetHandLocation(moveTo.position, moveTo.rotation);
-                            holdingObj.transform.position = Vector3.Lerp(startGrabbablePosition, holdingObj.transform.position, grabCurve.Evaluate(point));
-                            holdingObj.transform.rotation = Quaternion.Lerp(startGrabbableRotation, holdingObj.transform.rotation, grabCurve.Evaluate(point));
+
+                            body.position = transform.position;
+                            body.rotation = transform.rotation;
+                            holdingObj.body.transform.position = Vector3.Lerp(startGrabbablePosition, transform.TransformPoint(endGrabbablePosition), grabCurve.Evaluate(point*2));
+                            holdingObj.body.transform.rotation = Quaternion.Lerp(startGrabbableRotation, palmTransform.rotation*endGrabbableRotation, grabCurve.Evaluate(point*2));
+
+                            if (holdingObj.body != null)
+                            {
+                                holdingObj.body.position = holdingObj.body.transform.position;
+                                holdingObj.body.rotation = holdingObj.body.transform.rotation;
+                                holdingObj.body.velocity = Vector3.zero;
+                                holdingObj.body.angularVelocity = Vector3.zero;
+                            }
+                            i += followVel.magnitude * Time.deltaTime * 2f;
+
                             yield return new WaitForEndOfFrame();
+
                         }
                     }
 
-                    if(holdingObj != null)
+                    if(holdingObj != null && holdingObj.body != null)
                         holdingObj.body.useGravity = useGravity;
-                    else
+                    else if(startHoldingObj.body != null)
                         startHoldingObj.body.useGravity = useGravity;
                 }
 
-                if(holdingObj != null)
-                    postGrabPose.SetPose(this, grabTarget);
-            }
-            else if(grabPose != null) {
-                holdingObj.body.velocity = Vector3.zero;
-                holdingObj.body.angularVelocity = Vector3.zero;
-                body.velocity = Vector3.zero;
-                body.angularVelocity = Vector3.zero;
-                grabPose.SetHandPose(this);
-            }
+                if(holdingObj != null) {
+                    if(grabPose != null)
+                        grabPose.SetHandPose(this, grabTarget);
+                    else
+                        postGrabPose.SetPose(this, grabTarget);
+                    body.position = transform.position;
+                    body.rotation = transform.rotation;
+                    if (holdingObj.body != null)
+                    {
+                        holdingObj.body.position = holdingObj.body.transform.position;
+                        holdingObj.body.rotation = holdingObj.body.transform.rotation;
+                    }
+                }
 
-            //Hand Swap - One Handed Items
-            if(grab.singleHandOnly && grab.HeldCount() > 0) {
-                grab.ForceHandRelease(grab.GetHeldBy()[0]);
-                yield return new WaitForFixedUpdate();
+            }
+            else {
+                //Hand Swap - One Handed Items
+                if(holdingObj.singleHandOnly && holdingObj.HeldCount() > 0) {
+                    holdingObj.ForceHandRelease(holdingObj.GetHeldBy()[0]);
+                    if (holdingObj.body != null)
+                    {
+                        holdingObj.body.velocity = Vector3.zero;
+                        holdingObj.body.angularVelocity = Vector3.zero;
+                    }
+                }
+
+                if(grabPose != null) {
+                    grabPose.SetHandPose(this, grabPose.transform);
+                }
             }
 
             if(holdingObj == null) {
@@ -931,64 +1094,51 @@ namespace Autohand {
                 yield break;
             }
 
-            if(!instantGrab && !(holdingObj.grabType == HandGrabType.GrabbableToHand) && !(grabType == GrabType.GrabbableToHand)) {
-                grabPositionOffset = transform.position - follow.transform.position;
-                grabRotationOffset = Quaternion.Inverse(follow.transform.rotation) * transform.rotation;
-            }
+            holdingObj.ActivateRigidbody();
+            CreateJoint(holdingObj, holdingObj.jointBreakForce * ((1f / Time.fixedUnscaledDeltaTime) / 60f), float.PositiveInfinity);
+
+            SetMoveTo();
 
             grabPoint.transform.position = transform.position;
             grabPoint.transform.rotation = transform.rotation;
-            CreateJoint(holdingObj, holdingObj.jointBreakForce * ((1f / Time.fixedUnscaledDeltaTime) / 60f), float.PositiveInfinity);
+            grabPosition.position = holdingObj.transform.position;
+            grabPosition.rotation = holdingObj.transform.rotation;
 
             OnGrabbed?.Invoke(this, holdingObj);
             holdingObj.OnGrab(this);
 
 
-            grabbed = true;
-            /*
-            bool objectFree = holdingObj.body.isKinematic == false && holdingObj.body.constraints == RigidbodyConstraints.None && holdingObj.parentOnGrab;
 
-            //Returns hand based on grab return time
-            if(grabType == GrabType.HandToGrabbable && objectFree && grabTime > 0 && !instantGrab) {
-                for(float i = 0; i < grabTime * (startGrabDist / reachDistance); i += Time.fixedDeltaTime) {
-                    SetMoveTo();
-                    if(holdingObj != null) {
-                        var point = i / (grabTime * (startGrabDist / reachDistance));
-                        body.position = Vector3.Lerp(body.position, moveTo.position, point);
-                        body.rotation = Quaternion.Lerp(body.rotation, moveTo.rotation, point);
-                    }
-                    else
-                        break;
-                    yield return new WaitForFixedUpdate();
-                }
+            if(!instantGrab || !holdingObj.parentOnGrab) {
+                grabPositionOffset = transform.position - follow.transform.position;
+                grabRotationOffset = Quaternion.Inverse(follow.transform.rotation) * transform.rotation;
             }
-            else */
-            
-            if(instantGrab || grabTime == 0) {
+            if(instantGrab && holdingObj.parentOnGrab) {
                 SetMoveTo();
                 SetHandLocation(moveTo.position, moveTo.rotation);
             }
-
 
             if(holdingObj == null) {
                 CancelGrab();
                 yield break;
             }
 
-
-
             void CancelGrab() {
                 BreakGrabConnection();
-                if(startHoldingObj) {
-                    startHoldingObj.body.velocity = Vector3.zero;
-                    startHoldingObj.body.angularVelocity = Vector3.zero;
+                if(startHoldingObj)
+                {
+                    if (startHoldingObj.body != null)
+                    {
+                        startHoldingObj.body.velocity = Vector3.zero;
+                        startHoldingObj.body.angularVelocity = Vector3.zero;
+                    }
                     startHoldingObj.beingGrabbed = false;
                 }
                 grabbing = false;
                 grabRoutine = null;
             }
 
-            //Reset Values
+            grabbed = true;
             grabbing = false;
             startHoldingObj.beingGrabbed = false;
             grabRoutine = null;
@@ -1051,15 +1201,25 @@ namespace Autohand {
 
         internal void TryRemoveHandPoseArea(HandPoseArea poseArea) {
             if(handPoseArea != null && handPoseArea.gameObject.Equals(poseArea.gameObject)) {
-                if(holdingObj == null) {
-                    if(handPoseArea != null)
-                        UpdatePose(preHandPoseAreaPose, handPoseArea.transitionTime);
-                    handPoseArea?.OnHandExit?.Invoke(this);
-                    handPoseArea = null;
+                try
+                {
+                    if (holdingObj == null)
+                    {
+                        if (handPoseArea != null)
+                            UpdatePose(preHandPoseAreaPose, handPoseArea.transitionTime);
+                        handPoseArea?.OnHandExit?.Invoke(this);
+                        handPoseArea = null;
+                    }
+                    else if (holdingObj != null)
+                    {
+                        handPoseArea?.OnHandExit?.Invoke(this);
+                        handPoseArea = null;
+                    }
                 }
-                else if(holdingObj != null) {
-                    handPoseArea?.OnHandExit?.Invoke(this);
+                catch(MissingReferenceException e)
+                {
                     handPoseArea = null;
+                    SetHandPose(preHandPoseAreaPose);
                 }
             }
         }

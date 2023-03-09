@@ -54,7 +54,6 @@ namespace Autohand
             if (hand.reachDistance != lastReachDistance){
                 var percent = hand.reachDistance / lastReachDistance;
                 lastReachDistance = hand.reachDistance;
-                hand.grabTime *= percent;
             }
         }
     #endif

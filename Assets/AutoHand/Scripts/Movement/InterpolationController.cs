@@ -12,6 +12,18 @@ namespace Autohand {
             get { return m_interpolationFactor; }
         }
 
+        public static InterpolationController _Instance;
+        public static InterpolationController Instance {
+            get {
+                if(_Instance == null && !FindObjectOfType<InterpolationController>()) {
+                    _Instance = new GameObject() { name = "InterpolationTracker" }.AddComponent<InterpolationController>();
+                    _Instance.transform.parent = AutoHandExtensions.transformParent;
+                }
+
+                return _Instance;
+            }
+        }
+
         public void Start() {
             m_lastFixedUpdateTimes = new float[2];
             m_newTimeIndex = 0;

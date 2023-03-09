@@ -119,12 +119,12 @@ namespace Autohand {
         }
 
 
-        public void SetPose(Hand hand, Transform relativeTo = null){
+        public void SetPose(Hand hand, Transform relativeTo = null) {
             //This might prevent static poses from breaking from the update
             if(rotationOffset != Vector3.zero)
                 localQuaternionOffset = Quaternion.Euler(rotationOffset);
 
-            if (relativeTo != null && relativeTo != hand.transform){
+            if(relativeTo != null && relativeTo != hand.transform) {
                 var tempContainer = AutoHandExtensions.transformRuler;
                 tempContainer.localScale = relativeTo.lossyScale;
                 tempContainer.position = relativeTo.position;
@@ -155,6 +155,49 @@ namespace Autohand {
             if(posePositions != null)
                 foreach(var finger in hand.fingers)
                     AssignChildrenPose(finger.transform, this);
+        }
+
+        /// <summary>Sets the finger pose without changing the hands position</summary>
+        public void SetFingerPose(Hand hand, Transform relativeTo = null) {
+            
+            int i = -1;
+            void AssignChildrenPose(Transform obj, HandPoseData pose) {
+                i++;
+                obj.localPosition = pose.posePositions[i];
+                obj.localRotation = pose.poseRotations[i];
+                for(int j = 0; j < obj.childCount; j++) {
+                    AssignChildrenPose(obj.GetChild(j), pose);
+                }
+            }
+
+            if(posePositions != null)
+                foreach(var finger in hand.fingers)
+                    AssignChildrenPose(finger.transform, this);
+        }
+
+        /// <summary>Sets the position without setting the finger pose</summary>
+        public void SetPosition(Hand hand, Transform relativeTo = null) {
+            //This might prevent static poses from breaking from the update
+            if(rotationOffset != Vector3.zero)
+                localQuaternionOffset = Quaternion.Euler(rotationOffset);
+
+            if(relativeTo != null && relativeTo != hand.transform) {
+                var tempContainer = AutoHandExtensions.transformRuler;
+                tempContainer.localScale = relativeTo.lossyScale;
+                tempContainer.position = relativeTo.position;
+                tempContainer.rotation = relativeTo.rotation;
+                var handMatch = AutoHandExtensions.transformRulerChild;
+                handMatch.localPosition = handOffset;
+                handMatch.localRotation = localQuaternionOffset;
+
+                hand.transform.position = handMatch.position;
+                hand.transform.rotation = handMatch.rotation;
+
+#if UNITY_EDITOR
+                if(Application.isEditor && !Application.isPlaying)
+                    GameObject.DestroyImmediate(tempContainer.gameObject);
+#endif
+            }
         }
 
         public static HandPoseData LerpPose(HandPoseData from, HandPoseData to, float point) {

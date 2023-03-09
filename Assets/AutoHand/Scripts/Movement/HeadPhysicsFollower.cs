@@ -14,11 +14,12 @@ namespace Autohand{
         [Header("Follow Settings")]
         public float followStrength = 50f;
         [Tooltip("The maximum allowed distance from the body for the headCamera to still move")]
-        public float maxBodyDistance = 0.5f;
+        //public float maxBodyDistance = 0.5f;
 
         internal SphereCollider headCollider;
         Vector3 startHeadPos;
         bool started;
+
         Transform _moveTo = null;
         Transform moveTo {
             get {
@@ -29,6 +30,7 @@ namespace Autohand{
                     _moveTo.transform.rotation = transform.rotation;
                     _moveTo.rotation = transform.rotation;
                     _moveTo.name = "HEAD FOLLOW POINT";
+                    _moveTo.parent = AutoHandExtensions.transformParent;
                 }
 
                 return _moveTo;
@@ -75,7 +77,6 @@ namespace Autohand{
                 return;
             
             
-            moveTo.position = headCamera.transform.position;
             MoveTo();
         }
 
@@ -84,15 +85,31 @@ namespace Autohand{
         }
         
         internal virtual void MoveTo() {
+            moveTo.position = headCamera.transform.position;
             var movePos = moveTo.position;
             var distance = Vector3.Distance(movePos, transform.position);
             
             //Sets velocity linearly based on distance from hand
             var vel = (movePos - transform.position).normalized * followStrength * distance;
             body.velocity = vel;
+            lastUpdateTime = Time.realtimeSinceStartup;
         }
 
-        
+        float lastUpdateTime;
+        protected virtual void Update() {
+            if(CollisionCount() == 0 && moveTo != null && !body.isKinematic) {
+                var deltaTime = (Time.realtimeSinceStartup - lastUpdateTime);
+
+                MoveTo();
+                transform.position = Vector3.MoveTowards(transform.position, moveTo.position, body.velocity.magnitude * deltaTime);
+                body.velocity = Vector3.MoveTowards(body.velocity, Vector3.zero, body.velocity.magnitude * deltaTime);
+                body.position = transform.position;
+            }
+
+            lastUpdateTime = Time.realtimeSinceStartup;
+        }
+
+
         public int CollisionCount() {
             return collisionTracker.collisionCount;
         }

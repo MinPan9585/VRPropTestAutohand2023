@@ -54,9 +54,9 @@ namespace Autohand{
             ResetBend();
             lastHitBend = 0;
 
-            for (float i = 0; i <= steps/10f; i++) {
+            for (float i = 0; i <= steps/5f; i++) {
                 results[0] = null;
-                lastHitBend = i / (steps / 10f);
+                lastHitBend = i / (steps / 5f);
                 for (int j = 0; j < fingerJoints.Length; j++){
                     fingerJoints[j].localPosition = Vector3.Lerp(minGripPosPose[j], maxGripPosPose[j], lastHitBend);
                     fingerJoints[j].localRotation = Quaternion.Lerp(minGripRotPose[j], maxGripRotPose[j], lastHitBend);
@@ -73,32 +73,7 @@ namespace Autohand{
             }
             
 
-            lastHitBend -= (10f/steps);
-            for (int i = 0; i <= steps/10f; i++){
-                results[0] = null;
-                lastHitBend += (1f/steps);
-                for(int j = 0; j < fingerJoints.Length; j++){
-                    fingerJoints[j].localPosition = Vector3.Lerp(minGripPosPose[j], maxGripPosPose[j], lastHitBend);
-                    fingerJoints[j].localRotation = Quaternion.Lerp(minGripRotPose[j], maxGripRotPose[j], lastHitBend);
-                }
-                Physics.OverlapSphereNonAlloc(tip.transform.position, tipRadius, results, layermask, QueryTriggerInteraction.Ignore);
-                
-
-                if (results[0] != null){
-                    bend = lastHitBend;
-                    currBendOffset = lastHitBend;
-                    lastHitBend = Mathf.Clamp01(lastHitBend);
-                    return true;
-                }
-
-                if (lastHitBend >= 1) {
-                    lastHitBend = Mathf.Clamp01(lastHitBend);
-                    return true;
-                }
-            }
-
-            steps *= 10;
-            lastHitBend -= (10f/steps);
+            lastHitBend -= (5f/steps);
             for (int i = 0; i <= steps/10f; i++){
                 results[0] = null;
                 lastHitBend += (1f/steps);
@@ -126,6 +101,7 @@ namespace Autohand{
 
             return false;
         }
+
 
     
         /// <summary>Bends the finger unless its hitting something</summary>
@@ -158,11 +134,21 @@ namespace Autohand{
                 fingerJoints[i].localRotation = Quaternion.Lerp(minGripRotPose[i], maxGripRotPose[i], currBendOffset+secondaryOffset);
             }
         }
-    
+
         /// <summary>Forces the finger to a bend ignoring physics and offset</summary>
         /// <param name="bend">0 is no bend / 1 is full bend</param>
         public void SetFingerBend(float bend) {
             this.bend = bend;
+            for(int i = 0; i < fingerJoints.Length; i++) {
+                fingerJoints[i].localPosition = Vector3.Lerp(minGripPosPose[i], maxGripPosPose[i], bend);
+                fingerJoints[i].localRotation = Quaternion.Lerp(minGripRotPose[i], maxGripRotPose[i], bend);
+            }
+        }
+        
+        /// <summary>Sets the current finger to a bend without interfering with the target</summary>
+         /// <param name="bend">0 is no bend / 1 is full bend</param>
+        public void SetCurrentFingerBend(float bend) {
+            currBendOffset = bend;
             for(int i = 0; i < fingerJoints.Length; i++) {
                 fingerJoints[i].localPosition = Vector3.Lerp(minGripPosPose[i], maxGripPosPose[i], bend);
                 fingerJoints[i].localRotation = Quaternion.Lerp(minGripRotPose[i], maxGripRotPose[i], bend);
@@ -175,7 +161,7 @@ namespace Autohand{
 
             var offsetValue = bendOffset + bend;
             if(currBendOffset != offsetValue)
-                currBendOffset = Mathf.MoveTowards(currBendOffset, offsetValue, 7*fingerSmoothSpeed * Time.deltaTime);
+                currBendOffset = Mathf.MoveTowards(currBendOffset, offsetValue, 6*fingerSmoothSpeed * Time.deltaTime);
         }
     
 
@@ -279,6 +265,24 @@ namespace Autohand{
                 maxGripRotPose[point] = rot;
                 fingerJoints[point] = joint;
             }
+        }
+
+
+        public void CopyPose(Finger finger)
+        {
+            maxGripPosPose = new Vector3[finger.maxGripPosPose.Length];
+            finger.maxGripPosPose.CopyTo(maxGripPosPose, 0);
+            maxGripRotPose = new Quaternion[finger.maxGripRotPose.Length];
+            finger.maxGripRotPose.CopyTo(maxGripRotPose, 0);
+
+            minGripPosPose = new Vector3[finger.minGripPosPose.Length];
+            finger.minGripPosPose.CopyTo(minGripPosPose, 0);
+            minGripRotPose = new Quaternion[finger.minGripRotPose.Length];
+            finger.minGripRotPose.CopyTo(minGripRotPose, 0);
+
+            fingerJoints = new Transform[finger.fingerJoints.Length];
+            finger.fingerJoints.CopyTo(fingerJoints, 0);
+
         }
         
         public bool IsMinPoseSaved()

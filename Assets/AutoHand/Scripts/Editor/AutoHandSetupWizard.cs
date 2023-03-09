@@ -36,7 +36,8 @@ public class AutoHandSetupWizard : EditorWindow {
             assetPath = Application.dataPath;
         }
         else {
-            SetPhysicsSettings(handSettings.quality);
+            if(handSettings.quality >= 0)
+                SetPhysicsSettings(handSettings.quality);
         }
 
         EditorApplication.update -= Start;
@@ -57,6 +58,7 @@ public class AutoHandSetupWizard : EditorWindow {
 
 
     public void OnGUI() {
+
         var rect = EditorGUILayout.GetControlRect();
         rect.height *= 5;
         GUI.Label(rect, (Texture2D)Resources.Load("AutoHandLogo", typeof(Texture2D)), AutoHandExtensions.LabelStyle(TextAnchor.MiddleCenter, FontStyle.Normal, 25));
@@ -109,7 +111,7 @@ public class AutoHandSetupWizard : EditorWindow {
         }
         else if(quality <= 1) {
             GUI.Label(qualitySliderRect, "Fixed Timestep: 1/60", labelStyle);
-            GUI.Label(qualitySliderRect, "Contact Offset: 0.01", labelStyle);
+            GUI.Label(qualitySliderRect, "Contact Offset: 0.0075", labelStyle);
             GUI.Label(qualitySliderRect, "Sleep Threshold: 0.001", labelStyle);
             GUI.Label(qualitySliderRect, "Solver Iterations: 25", labelStyle);
             GUI.Label(qualitySliderRect, "Solver Velocity Iterations: 25", labelStyle);
@@ -117,7 +119,7 @@ public class AutoHandSetupWizard : EditorWindow {
         }
         else if(quality <= 2) {
             GUI.Label(qualitySliderRect, "Fixed Timestep: 1/72", labelStyle);
-            GUI.Label(qualitySliderRect, "Contact Offset: 0.01", labelStyle);
+            GUI.Label(qualitySliderRect, "Contact Offset: 0.005", labelStyle);
             GUI.Label(qualitySliderRect, "Sleep Threshold: 0.0005", labelStyle);
             GUI.Label(qualitySliderRect, "Solver Iterations: 50", labelStyle);
             GUI.Label(qualitySliderRect, "Solver Velocity Iterations: 50", labelStyle);
@@ -125,7 +127,7 @@ public class AutoHandSetupWizard : EditorWindow {
         }
         else if(quality <= 3) {
             GUI.Label(qualitySliderRect, "Fixed Timestep: 1/90", labelStyle);
-            GUI.Label(qualitySliderRect, "Contact Offset: 0.01", labelStyle);
+            GUI.Label(qualitySliderRect, "Contact Offset: 0.0035", labelStyle);
             GUI.Label(qualitySliderRect, "Sleep Threshold: 0.0001", labelStyle);
             GUI.Label(qualitySliderRect, "Solver Iterations: 100", labelStyle);
             GUI.Label(qualitySliderRect, "Solver Velocity Iterations: 100", labelStyle);
@@ -147,7 +149,7 @@ public class AutoHandSetupWizard : EditorWindow {
         else if(quality <= 1) {
             EnableAdaptiveForce();
             Time.fixedDeltaTime = 1 / 60f;
-            Physics.defaultContactOffset = 0.01f;
+            Physics.defaultContactOffset = 0.0075f;
             Physics.sleepThreshold = 0.001f;
             Physics.defaultSolverIterations = 25;
             Physics.defaultSolverVelocityIterations = 25;
@@ -156,7 +158,7 @@ public class AutoHandSetupWizard : EditorWindow {
         else if(quality <= 2) {
             EnableAdaptiveForce();
             Time.fixedDeltaTime = 1 / 72f;
-            Physics.defaultContactOffset = 0.01f;
+            Physics.defaultContactOffset = 0.005f;
             Physics.sleepThreshold = 0.00075f;
             Physics.defaultSolverIterations = 50;
             Physics.defaultSolverVelocityIterations = 50;
@@ -165,7 +167,7 @@ public class AutoHandSetupWizard : EditorWindow {
         else if(quality <= 3) {
             EnableAdaptiveForce();
             Time.fixedDeltaTime = 1 / 90f;
-            Physics.defaultContactOffset = 0.01f;
+            Physics.defaultContactOffset = 0.0035f;
             Physics.sleepThreshold = 0.0001f;
             Physics.defaultSolverIterations = 100;
             Physics.defaultSolverVelocityIterations = 100;
@@ -253,7 +255,6 @@ public class AutoHandSetupWizard : EditorWindow {
 
 
     static bool ShowSetupWindow() {
-
         return handSettings.quality == -1 && !handSettings.ignoreSetup;
     }
 

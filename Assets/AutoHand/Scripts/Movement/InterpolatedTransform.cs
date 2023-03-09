@@ -10,10 +10,6 @@ namespace Autohand {
 
         bool run = true;
 
-        void Awake() {
-            if(!FindObjectOfType<InterpolationController>())
-                new GameObject() { name = "InterpolationTracker" }.AddComponent<InterpolationController>();
-        }
 
         void OnEnable() {
 

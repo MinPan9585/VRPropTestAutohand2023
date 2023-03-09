@@ -7,6 +7,8 @@ namespace Autohand {
     public class GrabbableExtraEvents : MonoBehaviour {
         public UnityHandGrabEvent OnFirstGrab;
         public UnityHandGrabEvent OnLastRelease;
+        public UnityHandGrabEvent OnTwoHandedGrab;
+        public UnityHandGrabEvent OnTwoHandedRelease;
 
         Grabbable grab;
 
@@ -27,11 +29,17 @@ namespace Autohand {
             if(grab.HeldCount() == 1) {
                 OnFirstGrab?.Invoke(hand, grab);
             }
+            if(grab.HeldCount() == 2) {
+                OnTwoHandedGrab?.Invoke(hand, grab);
+            }
         }
 
         public void Release(Hand hand, Grabbable grab) {
             if(grab.HeldCount() == 0) {
                 OnLastRelease?.Invoke(hand, grab);
+            }
+            if(grab.HeldCount() == 1) {
+                OnTwoHandedRelease?.Invoke(hand, grab);
             }
         }
     }

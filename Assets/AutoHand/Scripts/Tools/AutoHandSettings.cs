@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "AutoHand Pose", menuName = "Auto Hand/Custom Settings", order = 1)]
 public class AutoHandSettings : ScriptableObject{
     [Tooltip("Whether the popup should be ignored on launch or not")]
     public bool ignoreSetup = false;

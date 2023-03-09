@@ -9,6 +9,54 @@ using UnityEditor;
 using UnityEngine.Serialization;
 
 namespace Autohand {
+    public struct SaveRigidbodyData
+    {
+        GameObject origin;
+        float mass;
+        float angularDrag;
+        float drag;
+        bool useGravity;
+        bool isKinematic;
+        RigidbodyInterpolation interpolation;
+        CollisionDetectionMode collisionDetectionMode;
+        RigidbodyConstraints constraints;
+        
+        public SaveRigidbodyData(Rigidbody from, bool removeBody = true)
+        {
+            origin = from.gameObject;
+            mass = from.mass;
+            drag = from.drag;
+            angularDrag = from.angularDrag;
+            useGravity = from.useGravity;
+            isKinematic = from.isKinematic;
+            interpolation = from.interpolation;
+            collisionDetectionMode = from.collisionDetectionMode;
+            constraints = from.constraints;
+            if(removeBody)
+                GameObject.Destroy(from);
+        }
+
+        public Rigidbody ReloadRigidbody(){
+            if(origin != null){
+                if (origin.CanGetComponent<Rigidbody>(out var currBody))
+                    return currBody;
+                var from = origin.AddComponent<Rigidbody>();
+                from.mass = mass;
+                from.drag = drag;
+                from.angularDrag = angularDrag;
+                from.useGravity = useGravity;
+                from.isKinematic = isKinematic;
+                from.interpolation = interpolation;
+                from.collisionDetectionMode = collisionDetectionMode;
+                from.constraints = constraints;
+                origin = null;
+                return from;
+            }
+            return null;
+        }
+    }
+
+    [DefaultExecutionOrder(-5)]
     public class GrabbableBase : MonoBehaviour{
 
         [AutoHeader("Grabbable")]
@@ -37,6 +85,7 @@ namespace Autohand {
         protected Vector3 lastCenterOfMassPos;
         protected Quaternion lastCenterOfMassRot;
         protected CollisionDetectionMode detectionMode;
+        protected RigidbodyInterpolation startInterpolation;
 
         protected internal bool beingGrabbed = false;
         protected bool heldBodyJointed = false;
@@ -46,15 +95,21 @@ namespace Autohand {
         protected Coroutine resetLayerRoutine = null;
         protected List<GrabbableChild> grabChildren = new List<GrabbableChild>();
         protected List<Transform> jointedParents = new List<Transform>();
-        protected Dictionary<Transform, GrabbablePoseCombiner> poses = new Dictionary<Transform, GrabbablePoseCombiner>();
+        protected GrabbablePoseCombiner poseCombiner;
+        protected List<Grabbable> jointedGrabbables = new List<Grabbable>();
+        protected float lastUpdateTime;
 
+        protected bool rigidbodyDeactivated = false;
+        protected SaveRigidbodyData rigidbodyData;
 
         private CollisionTracker _collisionTracker;
         public CollisionTracker collisionTracker {
             get {
                 if(_collisionTracker == null) {
-                    _collisionTracker = gameObject.AddComponent<CollisionTracker>();
-                    _collisionTracker.disableTriggersTracking = true;
+                    if(!(_collisionTracker = GetComponent<CollisionTracker>())) {
+                        _collisionTracker = gameObject.AddComponent<CollisionTracker>();
+                        _collisionTracker.disableTriggersTracking = true;
+                    }
                 }
                 return _collisionTracker;
             }
@@ -99,15 +154,24 @@ namespace Autohand {
             originalLayer = gameObject.layer;
             originalParent = body.transform.parent;
             detectionMode = body.collisionDetectionMode;
+            startInterpolation = body.interpolation;
             SetCollidersRecursive(body.transform);
         }
 
         protected virtual void Start() {
+            if(!gameObject.CanGetComponent(out poseCombiner))
+                poseCombiner = gameObject.AddComponent<GrabbablePoseCombiner>();
+
             GetPoseSaves(transform);
 
             void GetPoseSaves(Transform obj) {
-                if(obj.CanGetComponent(out GrabbablePoseCombiner combiner))
-                    poses.Add(obj, combiner);
+                //Stop if you get to another grabbable
+                if(obj.CanGetComponent(out Grabbable grab) && grab != this)
+                    return;
+
+                var poses = obj.GetComponents<GrabbablePose>();
+                for(int i = 0; i < poses.Length; i++)
+                    poseCombiner.AddPose(poses[i]);
 
                 for(int i = 0; i < obj.childCount; i++)
                     GetPoseSaves(obj.GetChild(i));
@@ -115,11 +179,12 @@ namespace Autohand {
         }
 
         protected virtual void FixedUpdate() {
-            if(heldBy.Count > 0) {
+            if(heldBy.Count > 0 && body != null) {
                 lastCenterOfMassRot = body.transform.rotation;
                 lastCenterOfMassPos = body.transform.position;
             }
         }
+
 
         protected virtual void OnDisable(){
             if (resetLayerRoutine != null){
@@ -140,7 +205,23 @@ namespace Autohand {
         }
         
 
+        public void DeactivateRigidbody()
+        {
+            if (body != null){
+                if(body != null)
+                    rigidbodyData = new SaveRigidbodyData(body);
+                body = null;
+                rigidbodyDeactivated = true;
+            }
+        }
 
+        public void ActivateRigidbody()
+        {
+            if (rigidbodyDeactivated){
+                rigidbodyDeactivated = false;
+                body = rigidbodyData.ReloadRigidbody();
+            }
+        }
 
 
         protected int GetOriginalLayer(){
@@ -168,23 +249,25 @@ namespace Autohand {
             SetLayerRecursive(obj, obj.gameObject.layer, newLayer);
         }
 
-
+        protected Hand ignoringHand = null;
         //Invoked a quatersecond after releasing
         protected IEnumerator IgnoreHandCollision(float time, Hand hand) {
-            IgnoreHand(hand, true);
-
-            yield return new WaitForSeconds(time);
+            if(ignoringHand != null)
+                IgnoreHand(ignoringHand, false);
+            ignoringHand = hand;
+            if (time > 0){
+                IgnoreHand(hand, true);
+                yield return new WaitForSeconds(time);
+            }
 
             IgnoreHand(hand, false);
-            OriginalCollisionDetection();
-
+            ignoringHand = null;
             resetLayerRoutine = null;
-
         }
 
-        public bool GetSavedPose(Transform poseTarget, out GrabbablePoseCombiner pose) {
-            if(poses.ContainsKey(poseTarget)) {
-                pose = poses[poseTarget];
+        public bool GetSavedPose(out GrabbablePoseCombiner pose) {
+            if(poseCombiner != null && poseCombiner.PoseCount() > 0) {
+                pose = poseCombiner;
                 return true;
             }
             else {
@@ -194,12 +277,9 @@ namespace Autohand {
         }
 
         public bool HasCustomPose() {
-            return poses.Count > 0;
+            return poseCombiner.PoseCount() > 0;
         }
 
-        public int HeldCollisions() {
-            return collisionTracker.collisionObjects.Count;
-        }
 
         public void IgnoreHand(Hand hand, bool ignore)
         {
@@ -207,7 +287,7 @@ namespace Autohand {
                 hand.HandIgnoreCollider(col, ignore);
         }
 
-        List<Collider> grabColliders = new List<Collider>();
+        protected List<Collider> grabColliders = new List<Collider>();
         void SetCollidersRecursive(Transform obj){
             foreach (var col in obj.GetComponents<Collider>())
                 grabColliders.Add(col);
@@ -217,9 +297,12 @@ namespace Autohand {
         }
         
         //Resets to original collision dection
-        protected void OriginalCollisionDetection() {
-            if(body != null && gameObject.layer == originalLayer)
+        protected void ResetRigidbody() {
+            if (body != null)
+            {
                 body.collisionDetectionMode = detectionMode;
+                body.interpolation = startInterpolation;
+            }
         }
 
         public bool BeingDestroyed() {

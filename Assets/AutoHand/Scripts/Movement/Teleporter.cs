@@ -76,9 +76,9 @@ namespace Autohand{
                 lineArr[i].y += curveStrength * (time - Mathf.Pow(9.8f*0.5f*time, 2));
                 lineList.Add(lineArr[i]);
                 if(i != 0) {
-                    if(Physics.Raycast(lineArr[i-1], lineArr[i]-lineArr[i-1], out aimHit, Vector3.Distance(lineArr[i], lineArr[i-1]), layer)) {
+                    if(Physics.Raycast(lineArr[i-1], lineArr[i]-lineArr[i-1], out aimHit, Vector3.Distance(lineArr[i], lineArr[i-1]), ~Hand.GetHandsLayerMask(), QueryTriggerInteraction.Ignore)) {
                         //Makes sure the angle isnt too steep
-                        if(Vector3.Angle(aimHit.normal, Vector3.up) <= maxSurfaceAngle){
+                        if(Vector3.Angle(aimHit.normal, Vector3.up) <= maxSurfaceAngle && layer == (layer | (1 << aimHit.collider.gameObject.layer))) {
                             line.colorGradient = canTeleportColor;
                             lineList.Add(aimHit.point);
                             hitting = true;

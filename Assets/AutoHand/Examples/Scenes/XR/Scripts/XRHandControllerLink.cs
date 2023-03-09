@@ -71,18 +71,21 @@ namespace Autohand.Demo{
                 hand.SetGrip(GetAxis(grabAxis));
 
                 //Grab input
-                if(device.TryGetFeatureValue(GetCommonButton(grabButton), out bool grip)) {
-                    if(grabbing && !grip){
+                if (device.TryGetFeatureValue(CommonUsages.grip, out float grip))
+                {
+                    if (grabbing && grip <= 0.2f)
+                    {
                         hand.Release();
                         grabbing = false;
                     }
-                    else if(!grabbing && grip){
+                    else if (!grabbing && grip >= 0.8f)
+                    {
                         hand.Grab();
                         grabbing = true;
                     }
                 }
                 //Squeeze input
-                if(device.TryGetFeatureValue(GetCommonButton(squeezeButton), out bool squeeze)) {
+                if (device.TryGetFeatureValue(GetCommonButton(squeezeButton), out bool squeeze)) {
                     if(squeezing && !squeeze){
                         hand.Unsqueeze();
                         squeezing = false;

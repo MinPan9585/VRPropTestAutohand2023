@@ -4,21 +4,15 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace Autohand{
+    //This script is used to hide rigidbody physics instabilitites by
+    //putting the hand where it visually should be on prerender
+    //and putting it where it physically should be on post render
+    [DefaultExecutionOrder(-5)]
     public class HandStabilizer : MonoBehaviour{
-        //This is the script that hides unstable joints without compromising joint functionality
-        Hand[] hands = null;
-        Vector3[] handsDeltaPos;
+        public HandBase hand = null;
 
-        void Start()
-        {
-#if UNITY_2020_1_OR_NEWER
-            hands = FindObjectsOfType<Hand>(true);
-#else
-            hands = FindObjectsOfType<Hand>();
-#endif
-            handsDeltaPos = new Vector3[hands.Length];
-
-            if (!GetComponent<Camera>().enabled)
+        void Start(){
+            if (!GetComponent<Camera>().enabled || hand == null)
                 enabled = false;
         }
 
@@ -35,46 +29,32 @@ namespace Autohand{
                 RenderPipelineManager.endCameraRendering -= OnPostRender;
             }
         }
-        
-        private void OnPostRender() {
-            if (!enabled || hands == null)
-                return;
-            foreach(var hand in hands) {
-                if(hand.gameObject.activeInHierarchy)
-                    hand.OnPostRender();
-            }
-        }
 
+        private void Update() {
+            if(hand == null)
+                enabled = false;
+        }
 
         private void OnPreRender() {
-            if (!enabled || hands == null)
-                return;
-
-            foreach(var hand in hands) {
-                if (hand.gameObject.activeInHierarchy)
-                    hand.OnPreRender();
-            }
-
+            if (hand.gameObject.activeInHierarchy)
+                hand.OnPreRender();
         }
 
-        private void OnPreRender(ScriptableRenderContext src, Camera cam) {
-            if (!enabled || hands == null)
-                return;
+        private void OnPostRender() {
+            if(hand.gameObject.activeInHierarchy)
+                hand.OnPostRender();
+        }
 
-            foreach(var hand in hands) {
-                if (hand.gameObject.activeInHierarchy)
-                    hand.OnPreRender();
-            }
+
+
+        private void OnPreRender(ScriptableRenderContext src, Camera cam) {
+            if (hand.gameObject.activeInHierarchy)
+                hand.OnPreRender();
         }
 
         private void OnPostRender(ScriptableRenderContext src, Camera cam) {
-            if (!enabled || hands == null)
-                return;
-
-            foreach(var hand in hands) {
-                if (hand.gameObject.activeInHierarchy)
-                    hand.OnPostRender();
-            }
+            if (hand.gameObject.activeInHierarchy)
+                hand.OnPostRender();
         }
         
     }

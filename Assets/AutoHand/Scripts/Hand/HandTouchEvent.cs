@@ -52,9 +52,6 @@ namespace Autohand{
             if(hands.Contains(hand)) {
                 if(oneHanded && hands[0] == hand){
                     HandStopTouchEvent?.Invoke(hand);
-                    
-                    if(hands.Count > 1)
-                        HandStartTouchEvent?.Invoke(hand);
                 }
                 else if(!oneHanded){
                     HandStopTouchEvent?.Invoke(hand);

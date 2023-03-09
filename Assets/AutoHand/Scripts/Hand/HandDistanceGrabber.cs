@@ -15,7 +15,6 @@ namespace Autohand {
         public Hand secondaryHand;
 
         [Header("Pointing Options")]
-        [Header("Pointer Options")]
         public Transform forwardPointer;
         public LineRenderer line;
         [Space]
@@ -173,16 +172,22 @@ namespace Autohand {
                 GrabbableChild hitGrabbableChild;
                 if(didHit) {
                     if(hit.transform.CanGetComponent(out hitGrabbable)) {
-                        if(hitGrabbable != targetingDistanceGrabbable) {
+                        if(targetingDistanceGrabbable == null || hitGrabbable.GetInstanceID() != targetingDistanceGrabbable.GetInstanceID())
+                        {
                             StartTargeting(hitGrabbable);
                         }
                     }
                     else if(hit.transform.CanGetComponent(out hitGrabbableChild)) {
                         if(hitGrabbableChild.grabParent.transform.CanGetComponent(out hitGrabbable)) {
-                            if(hitGrabbable != targetingDistanceGrabbable) {
+                            if(targetingDistanceGrabbable == null || hitGrabbable.GetInstanceID() != targetingDistanceGrabbable.GetInstanceID())
+                            {
                                 StartTargeting(hitGrabbable);
                             }
                         }
+                    }
+                    else if(targetingDistanceGrabbable != null && hit.transform.gameObject.GetInstanceID() != targetingDistanceGrabbable.gameObject.GetInstanceID())
+                    {
+                        StopTargeting();
                     }
                 }
                 else {
@@ -245,7 +250,7 @@ namespace Autohand {
         }
 
         public virtual void StopTargeting() {
-            targetingDistanceGrabbable?.grabbable.Unhighlight(primaryHand);
+            targetingDistanceGrabbable?.grabbable.Unhighlight(primaryHand, GetTargetedMaterial(targetingDistanceGrabbable));
             targetingDistanceGrabbable?.StopTargeting?.Invoke(primaryHand, targetingDistanceGrabbable.grabbable);
             if(targetingDistanceGrabbable != null)
                 StopTarget?.Invoke(primaryHand, targetingDistanceGrabbable.grabbable);
@@ -266,7 +271,7 @@ namespace Autohand {
                 }
                 selectingDistanceGrabbable = targetingDistanceGrabbable;
                 selectedEstimatedRadius = Vector3.Distance(hitPoint.transform.position, selectingDistanceGrabbable.transform.position);
-                selectingDistanceGrabbable.grabbable.Unhighlight(primaryHand);
+                selectingDistanceGrabbable.grabbable.Unhighlight(primaryHand, GetTargetedMaterial(selectingDistanceGrabbable));
                 selectingDistanceGrabbable.grabbable.Highlight(primaryHand, GetSelectedMaterial(selectingDistanceGrabbable));
                 selectingDistanceGrabbable?.StartSelecting?.Invoke(primaryHand, selectingDistanceGrabbable.grabbable);
                 targetingDistanceGrabbable?.StopTargeting?.Invoke(primaryHand, selectingDistanceGrabbable.grabbable);
@@ -279,7 +284,7 @@ namespace Autohand {
         public virtual void CancelSelect() {
             StopTargeting();
             pulling = false;
-            selectingDistanceGrabbable?.grabbable.Unhighlight(primaryHand);
+            selectingDistanceGrabbable?.grabbable.Unhighlight(primaryHand, GetSelectedMaterial(selectingDistanceGrabbable));
             selectingDistanceGrabbable?.StopSelecting?.Invoke(primaryHand, selectingDistanceGrabbable.grabbable);
             if(selectingDistanceGrabbable != null)
                 StopSelect?.Invoke(primaryHand, selectingDistanceGrabbable.grabbable);
@@ -294,17 +299,35 @@ namespace Autohand {
                     selectingDistanceGrabbable.grabbable.body.velocity = Vector3.zero;
                     selectingDistanceGrabbable.grabbable.body.angularVelocity = Vector3.zero;
                     selectionHit.point = hitPoint.transform.position;
+                    if (selectingDistanceGrabbable.grabbable.placePoint != null)
+                        selectingDistanceGrabbable.grabbable.placePoint.Remove();
                     primaryHand.Grab(selectionHit, selectingDistanceGrabbable.grabbable);
                     CancelSelect();
                     selectingDistanceGrabbable?.CancelTarget();
                 }
-                else {
+                else if(selectingDistanceGrabbable.grabType == DistanceGrabType.Velocity) {
                     catchAssistRoutine = StartCoroutine(StartCatchAssist(selectingDistanceGrabbable, selectedEstimatedRadius));
                     catchAsistGrabbable = selectingDistanceGrabbable;
+                    if (selectingDistanceGrabbable.grabbable.placePoint != null)
+                    {
+                        
+                        selectingDistanceGrabbable.grabbable.placePoint.Remove();
+                    }
                     selectingDistanceGrabbable.SetTarget(primaryHand.palmTransform);
                 }
+                else if(selectingDistanceGrabbable.grabType == DistanceGrabType.Linear) {
+                    selectingDistanceGrabbable.grabbable.body.velocity = Vector3.zero;
+                    selectingDistanceGrabbable.grabbable.body.angularVelocity = Vector3.zero;
+                    selectionHit.point = hitPoint.transform.position;
+                    if (selectingDistanceGrabbable.grabbable.placePoint != null)
+                        selectingDistanceGrabbable.grabbable.placePoint.Remove();
+                    primaryHand.Grab(selectionHit, selectingDistanceGrabbable.grabbable, GrabType.GrabbableToHand);
+                    CancelSelect();
+                    selectingDistanceGrabbable?.CancelTarget();
 
-                CancelSelect();
+                }
+
+                    CancelSelect();
             }
         }
 

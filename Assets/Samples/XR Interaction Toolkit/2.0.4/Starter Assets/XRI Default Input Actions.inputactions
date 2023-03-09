@@ -1075,11 +1075,11 @@
             ]
         },
         {
-            "name": "RightChangeColor",
+            "name": "RightThumbstick",
             "id": "15480776-243f-4bf3-9117-fec9d53f5f5d",
             "actions": [
                 {
-                    "name": "ChangeColor",
+                    "name": "RightThumbstickValue",
                     "type": "Value",
                     "id": "b54b2dce-feaa-490d-b3d6-d073f7dab1d0",
                     "expectedControlType": "Vector2",
@@ -1096,7 +1096,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "ChangeColor",
+                    "action": "RightThumbstickValue",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

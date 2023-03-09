@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/GalaxyPen0308.unity
+    path: Assets/Scenes/GalaxyPen0309.unity
     guid: b49864f787eb80a4db86c8065aa6c0cc
   m_configObjects:
     Unity.XR.PXR.Settings: {fileID: 11400000, guid: 7784031ab538ad5468d079e204e47b3f,

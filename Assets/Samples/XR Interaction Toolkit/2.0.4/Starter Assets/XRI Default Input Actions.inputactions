@@ -1101,6 +1101,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "RightThumbstickTap",
+            "id": "39f85f1e-bdfc-41a6-8972-f5e291f89240",
+            "actions": [
+                {
+                    "name": "RightThumbstickTapValue",
+                    "type": "Value",
+                    "id": "6c78f7dc-0411-4844-9b3b-c930618c2108",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "Tap",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "6cf21c6c-6dba-4fdd-bfcb-c04ddb4c6ee0",
+                    "path": "<PXR_Controller>{RightHand}/thumbstick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightThumbstickTapValue",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

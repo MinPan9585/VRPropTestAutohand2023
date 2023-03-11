@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Sun : MonoBehaviour
+public class SwitchKinematic : MonoBehaviour
 {
     Rigidbody rb;
     private void Start()

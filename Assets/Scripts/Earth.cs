@@ -11,15 +11,29 @@ public class Earth : MonoBehaviour
 	public Transform center;
 	//°ë¾¶
 	public float radius;
+	bool circling = true;
 	void Update()
 	{
-		progress += Time.deltaTime * speed;
-		if (progress >= 360)
-		{
-			progress -= 360;
+        if (circling)
+        {
+			progress += Time.deltaTime * speed;
+			if (progress >= 360)
+			{
+				progress -= 360;
+			}
+			float x1 = center.position.x + radius * Mathf.Cos(progress);
+			float y1 = center.position.y + radius * Mathf.Sin(progress);
+			this.transform.localPosition = new Vector3(x1, 0, y1);
 		}
-		float x1 = center.position.x + radius * Mathf.Cos(progress);
-		float y1 = center.position.y + radius * Mathf.Sin(progress);
-		this.transform.localPosition = new Vector3(x1, 0, y1);
+	}
+
+	public void SetCirclingTrue()
+    {
+		circling = true;
+    }
+
+	public void SetCirclingFalse()
+	{
+		circling = false;
 	}
 }

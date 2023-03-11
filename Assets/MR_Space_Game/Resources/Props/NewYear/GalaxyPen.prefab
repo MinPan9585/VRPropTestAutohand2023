@@ -332,6 +332,7 @@ GameObject:
   - component: {fileID: 4434492781065306287}
   - component: {fileID: 1213894489311907589}
   - component: {fileID: 957403194}
+  - component: {fileID: 1582403637}
   m_Layer: 0
   m_Name: GalaxyPen
   m_TagString: Untagged
@@ -423,7 +424,7 @@ MonoBehaviour:
   jointedBodies: []
   heldIgnoreColliders: []
   pullApartBreakOnly: 1
-  showEvents: 0
+  showEvents: 1
   onGrab:
     m_PersistentCalls:
       m_Calls: []
@@ -432,10 +433,34 @@ MonoBehaviour:
       m_Calls: []
   onSqueeze:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1582403637}
+        m_TargetAssemblyTypeName: GalaxyPen, Assembly-CSharp
+        m_MethodName: SetPressedTrue
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onUnsqueeze:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1582403637}
+        m_TargetAssemblyTypeName: GalaxyPen, Assembly-CSharp
+        m_MethodName: SetPressedFalse
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onHighlight:
     m_PersistentCalls:
       m_Calls: []
@@ -564,6 +589,29 @@ MonoBehaviour:
     - {x: 0.009206588, y: -0.04830566, z: -0.15041105, w: 0.98739976}
     - {x: 2.7755576e-17, y: 1.3877788e-17, z: 1.0408341e-17, w: 1}
   leftPoseSet: 1
+--- !u!114 &1582403637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5668790195959486890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdb69c5c61812ff44ae8dfc8c64988a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  changePrefabAction: {fileID: -1425757525287515880, guid: c348712bda248c246b8c49b3db54643f,
+    type: 3}
+  drawPrefabAction: {fileID: 83097790271614945, guid: c348712bda248c246b8c49b3db54643f,
+    type: 3}
+  cloudPrefab: {fileID: 8817513317907142678, guid: fa3640c4de2dfb041918c93c958f0343,
+    type: 3}
+  tip: {fileID: 1213691059214025563}
+  brushesPrefab:
+  - {fileID: 8817513317907142678, guid: fa3640c4de2dfb041918c93c958f0343, type: 3}
+  - {fileID: 8799510080729092603, guid: 30e27d7dad08794438769b3299b425cd, type: 3}
+  - {fileID: 48503896244248274, guid: c47ee83e1cbd3d54c8b7ccb09a98d37f, type: 3}
 --- !u!1 &6322257693098360163
 GameObject:
   m_ObjectHideFlags: 0

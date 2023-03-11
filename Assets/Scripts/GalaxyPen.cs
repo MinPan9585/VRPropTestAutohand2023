@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Autohand;
 
 public class GalaxyPen : MonoBehaviour
 {
@@ -9,8 +10,8 @@ public class GalaxyPen : MonoBehaviour
     [SerializeField] private InputActionReference drawPrefabAction;
     public GameObject cloudPrefab;
     public Transform tip;
-    //float penCooldown = 1f;
-    //float penNextCooldown = 0;
+    float penCooldown = 0.5f;
+    float penNextCooldown = 0.2f;
     public GameObject[] brushesPrefab;
     int index = 0;
     bool pressed = false;
@@ -18,12 +19,30 @@ public class GalaxyPen : MonoBehaviour
     void OnEnable()
     {
         changePrefabAction.action.performed += ChangePrefab;
-        drawPrefabAction.action.performed += setTrue;
+    }
+    void Update()
+    {
+        if (pressed)
+        {
+            if (Time.time > penNextCooldown)
+            {
+                Vector3 rotation = new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f));
+                Instantiate(brushesPrefab[index], tip.position, Quaternion.Euler(rotation));
+                penNextCooldown = Time.time + penCooldown;
+            }
+        }
+        //GetComponent<Grabbable>().OnSqueeze+= 
+
+    }
+    public void SetPressedTrue()
+    {
+        pressed = true;
     }
 
-    void setTrue(InputAction.CallbackContext ctx)
+    public void SetPressedFalse()
     {
-        pressed = true;    }
+        pressed = false;
+    }
 
     void ChangePrefab(InputAction.CallbackContext ctx)
     {
@@ -54,47 +73,4 @@ public class GalaxyPen : MonoBehaviour
             }
         }
     }
-
-    void Update()
-    {
-        if (pressed)
-        {
-            DrawPrefab(InputAction.CallbackContext ctx);
-            Vector3 rotation = new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f));
-            Instantiate(brushesPrefab[index], tip.position, Quaternion.Euler(rotation));
-        }
-
-    }
-
-    void DrawPrefab(InputAction.CallbackContext ctx)
-    {
-        if (Time.time > penNextCooldown)
-        {
-            Instantiate(cloudPrefab, transform.position, Quaternion.identity);
-            penNextCooldown = Time.time + penCooldown;
-        }
-
-
-        if (ctx.performed)
-        {
-            pressed = true;
-            
-        }
-        if (ctx.canceled)
-        {
-            pressed = false;
-            
-        }
-    }
-
-    //IEnumerator SpawnPrefab()
-    //{
-    //    if(pressed)
-    //    {
-    //        Vector3 rotation = new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f));
-    //        Instantiate(brushesPrefab[index], tip.position, Quaternion.Euler(rotation));
-    //        yield return new WaitForSeconds(0.4f);
-    //    }
-
-    //}
 }

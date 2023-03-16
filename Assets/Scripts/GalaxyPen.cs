@@ -10,11 +10,12 @@ public class GalaxyPen : MonoBehaviour
     [SerializeField] private InputActionReference drawPrefabAction;
     public GameObject cloudPrefab;
     public Transform tip;
-    float penCooldown = 0.5f;
-    float penNextCooldown = 0.2f;
+    float penCooldown = 0.2f;
+    float penNextCooldown = 0f;
     public GameObject[] brushesPrefab;
     int index = 0;
     bool pressed = false;
+    float scaleMultiplier;
 
     void OnEnable()
     {

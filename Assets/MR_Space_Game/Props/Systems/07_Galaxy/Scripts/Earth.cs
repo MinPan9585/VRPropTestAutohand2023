@@ -20,7 +20,7 @@ public class Earth : MonoBehaviour
 
 	private void Start()
     {
-		returningSpeed = radius;
+		returningSpeed = radius * 1.35f;
     }
     void Update()
 	{

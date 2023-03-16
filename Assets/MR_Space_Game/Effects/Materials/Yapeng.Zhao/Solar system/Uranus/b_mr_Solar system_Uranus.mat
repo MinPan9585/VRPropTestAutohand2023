@@ -74,7 +74,7 @@ Material:
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _Fresnel: {r: 0, g: 1, b: 3, a: 0}
     - _Fresnel2: {r: 0, g: 1, b: 2, a: 0}
-    - _Fresnel_Color: {r: 0.048727296, g: 0.6711119, b: 0.6886792, a: 0}
+    - _Fresnel_Color: {r: 0.048727274, g: 0.6711119, b: 0.6886792, a: 1}
     - _Fresnel_Color2: {r: 0, g: 0.9051378, b: 1, a: 0}
     - _Main_Color: {r: 0.42292628, g: 0.9056604, b: 0.8988613, a: 1}
     - _Main_Color2: {r: 0.4539426, g: 0.72640806, b: 0.95283014, a: 1}

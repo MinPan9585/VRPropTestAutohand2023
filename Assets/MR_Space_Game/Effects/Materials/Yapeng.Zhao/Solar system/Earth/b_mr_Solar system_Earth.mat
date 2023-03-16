@@ -47,6 +47,7 @@ Material:
     - _Color2: {r: 0.2688679, g: 1, b: 0.36377677, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _Fresnel: {r: 0, g: 0.5, b: 2, a: 0}
-    - _Fresnel_Color: {r: 0, g: 0.22621626, b: 1, a: 0}
+    - _Fresnel_Color: {r: 0, g: 0.2262162, b: 1, a: 0}
+    - _Main_Color: {r: 0.14231041, g: 0.467681, b: 0.7735849, a: 0}
     - _Main_color: {r: 0.4198113, g: 0.6543557, b: 1, a: 0}
   m_BuildTextureStacks: []

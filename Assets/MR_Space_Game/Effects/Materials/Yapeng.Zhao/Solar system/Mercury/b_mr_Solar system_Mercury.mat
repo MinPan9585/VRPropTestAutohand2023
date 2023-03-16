@@ -55,12 +55,12 @@ Material:
     m_Colors:
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _Fresnel: {r: 0, g: 1, b: 3, a: 0}
-    - _Fresnel_color: {r: 0.46844947, g: 0.60427797, b: 0.8207547, a: 0}
-    - _Main_Color: {r: 0.54788184, g: 0.64421505, b: 0.6792453, a: 0}
+    - _Fresnel_color: {r: 0.4684494, g: 0.60427797, b: 0.8207547, a: 1}
+    - _Main_Color: {r: 0.54788184, g: 0.64421505, b: 0.6792453, a: 1}
     - _Main_Color1: {r: 0.6179245, g: 0.7548349, b: 1, a: 0}
     - _Main_speed: {r: 0, g: 0, b: 0, a: 0}
     - _Main_speed1: {r: 0, g: 0, b: 0, a: 0}
-    - _Tex_Color: {r: 0.2591669, g: 0.44093743, b: 0.6037736, a: 0}
+    - _Tex_Color: {r: 0.25916687, g: 0.4409374, b: 0.6037736, a: 1}
     - _flow_speed: {r: 0, g: 0, b: 0, a: 0}
     - _flow_speed1: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

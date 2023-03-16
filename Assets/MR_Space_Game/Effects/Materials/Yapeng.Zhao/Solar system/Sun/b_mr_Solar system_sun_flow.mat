@@ -64,7 +64,7 @@ Material:
     - _int: 0.094
     - _int1: 0.094
     m_Colors:
-    - _Color0: {r: 4.8868895, g: 1.4072195, b: 0, a: 0}
+    - _Color0: {r: 4.8868895, g: 1.4072195, b: 0, a: 1}
     - _Color1: {r: 2.443445, g: 2.423841, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _Flow_UVSpeed: {r: 0.02, g: 0.02, b: 0, a: 0}

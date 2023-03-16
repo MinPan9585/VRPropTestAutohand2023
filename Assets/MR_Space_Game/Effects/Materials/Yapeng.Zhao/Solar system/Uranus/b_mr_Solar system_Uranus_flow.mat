@@ -34,7 +34,7 @@ Material:
     - _Dissovle: 0.941
     - _int: 0.11
     m_Colors:
-    - _Color: {r: 0.4672481, g: 0.7924528, b: 0.7506834, a: 0}
+    - _Color: {r: 0.46724802, g: 0.7924528, b: 0.7506834, a: 1}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _Speed: {r: 0.01, g: 0.02, b: 0, a: 0}
   m_BuildTextureStacks: []

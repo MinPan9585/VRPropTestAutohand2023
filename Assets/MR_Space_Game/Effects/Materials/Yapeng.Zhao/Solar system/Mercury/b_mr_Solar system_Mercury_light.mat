@@ -8,8 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: b_mr_Solar system_Mercury_light
-  m_Shader: {fileID: -6465566751694194690, guid: 2a5159e680d184043875424cd493995b,
-    type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 2a5159e680d184043875424cd493995b, type: 3}
   m_ValidKeywords:
   - _SURFACE_TYPE_TRANSPARENT
   m_InvalidKeywords: []
@@ -52,7 +51,7 @@ Material:
     - _CastShadows: 0
     - _Cull: 0
     - _DstBlend: 1
-    - _QueueControl: 1
+    - _QueueControl: 0
     - _QueueOffset: 50
     - _SrcBlend: 5
     - _Surface: 1
@@ -63,7 +62,6 @@ Material:
     - _MainColor: {r: 7.2342463, g: 7.2342463, b: 7.2342463, a: 1}
     - _MainSpeed: {r: 0, g: 0, b: 0, a: 0}
     - _MainTiling: {r: 1, g: 1, b: 0, a: 0}
-    - _MaskSpeed: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &5239073218134152796
 MonoBehaviour:

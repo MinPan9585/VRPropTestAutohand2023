@@ -34,6 +34,6 @@ Material:
     m_Colors:
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _Speed: {r: 0, g: 0, b: 0, a: 0}
-    - _Tex_Color: {r: 0.6415094, g: 0.10224656, b: 0.07564967, a: 0}
+    - _Tex_Color: {r: 0.6415094, g: 0.1022465, b: 0.07564964, a: 1}
     - _flow_speed: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

@@ -45,12 +45,12 @@ Material:
     - _AlphaCutoff: 0.5
     - _int: 0.061745413
     m_Colors:
-    - _Color: {r: 1.9607843, g: 0.87058824, b: 0, a: 0}
+    - _Color: {r: 1.9607843, g: 0.87058824, b: 0, a: 1}
     - _Color1: {r: 2, g: 0.77205336, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _Fresnel: {r: 0, g: 1, b: 0.5, a: 0}
-    - _Fresnel_Color: {r: 1, g: 0.2573742, b: 0, a: 0}
+    - _Fresnel_Color: {r: 1, g: 0.25737414, b: 0, a: 1}
     - _UV_speed: {r: -0.2, g: -0.2, b: 0, a: 0}
-    - _flow_Color: {r: 1, g: 0.13725491, b: 0, a: 0}
+    - _flow_Color: {r: 1, g: 0.13725491, b: 0, a: 1}
     - _speed: {r: 0.2, g: 0.2, b: 0, a: 0}
   m_BuildTextureStacks: []

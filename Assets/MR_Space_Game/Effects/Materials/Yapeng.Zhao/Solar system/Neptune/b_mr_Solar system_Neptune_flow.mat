@@ -63,7 +63,7 @@ Material:
     - _int: 0.03
     - _int1: 0
     m_Colors:
-    - _Color: {r: 0.48989856, g: 0.6254714, b: 0.9528302, a: 0}
+    - _Color: {r: 0.4898985, g: 0.6254714, b: 0.95283014, a: 1}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _Speed: {r: 0, g: 0.02, b: 0, a: 0}
     - _Speed1: {r: -0.025, g: 0, b: 0, a: 0}

@@ -38,7 +38,7 @@ Material:
     - _Dissolve: 0.057
     - _int: 0.029
     m_Colors:
-    - _Color: {r: 0.6320754, g: 0.6320754, b: 0.6320754, a: 0}
+    - _Color: {r: 0.6320754, g: 0.6320754, b: 0.6320754, a: 1}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _Flow_Speed: {r: 0, g: 0, b: 0, a: 0}
     - _Speed1: {r: 0, g: 0, b: 0, a: 0}

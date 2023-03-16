@@ -1,0 +1,86 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: b_mr_Solar system_Jupiter_flow 3
+  m_Shader: {fileID: 4800000, guid: b5269b9d976b6404b9cf84ca2f909e1d, type: 3}
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 15af74a9cac5d4b4cbce950e06bef8b8, type: 3}
+        m_Scale: {x: 0, y: 2}
+        m_Offset: {x: 0, y: 1.31}
+    - _MainTex1:
+        m_Texture: {fileID: 2800000, guid: 82f9704993f8ebb4d912e6d7950d8255, type: 3}
+        m_Scale: {x: 0, y: 5}
+        m_Offset: {x: 0, y: 0}
+    - _Turbulence_115_c:
+        m_Texture: {fileID: 2800000, guid: a95eca6fce3ddd04e8886c3b9dee8969, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Turbulence_115_c1:
+        m_Texture: {fileID: 2800000, guid: a95eca6fce3ddd04e8886c3b9dee8969, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Turbulence_270_c:
+        m_Texture: {fileID: 2800000, guid: fd9e65c4f7d37ec47b276b1330d7c715, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Turbulence_270_c1:
+        m_Texture: {fileID: 2800000, guid: fd9e65c4f7d37ec47b276b1330d7c715, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Turbulence_Mars_1:
+        m_Texture: {fileID: 2800000, guid: b5d351a858bfacb479b73f38873bc7ae, type: 3}
+        m_Scale: {x: 0, y: 4}
+        m_Offset: {x: 0, y: -1.91}
+    - _Turbulence_Mars_2:
+        m_Texture: {fileID: 2800000, guid: 1409f678e455931408623a196ceac886, type: 3}
+        m_Scale: {x: 0, y: 2}
+        m_Offset: {x: 0, y: 0.77}
+    - _flowTex:
+        m_Texture: {fileID: 2800000, guid: c5d01b00dc8bd6d43a4c2f4fb37baacf, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _flowTex1:
+        m_Texture: {fileID: 2800000, guid: c5d01b00dc8bd6d43a4c2f4fb37baacf, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AlphaCutoff: 0.5
+    - _Dissovle: 0.053
+    - _Dissovle1: 0.163
+    - _flow: 0.019
+    - _flow1: 0.056
+    - _int: 0.07
+    - _int1: 0.118
+    m_Colors:
+    - _Color0: {r: 0.7075472, g: 0.55418223, b: 0.33708617, a: 0}
+    - _Color1: {r: 0.41598436, g: 0.7169812, b: 0.57227117, a: 0}
+    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _Speed: {r: 0, g: 0.02, b: 0, a: 0}
+    - _Speed1: {r: 0, g: 0, b: 0, a: 0}
+    - _Tex_Color: {r: 0.7264151, g: 0.50213003, b: 0.33236918, a: 0}
+    - _Tex_Color1: {r: 0.8207547, g: 0.80914026, b: 0.80914026, a: 0}
+    - _Tex_speed: {r: 0, g: 0, b: 0, a: 0}
+    - _Tex_speed1: {r: 0, g: 0, b: 0, a: 0}
+    - _flow_speed: {r: -0.025, g: 0, b: 0, a: 0}
+    - _flow_speed1: {r: -0.03, g: 0, b: 0, a: 0}
+    - _flow_speed2: {r: 0.035, g: 0, b: 0, a: 0}
+    - _flow_speed3: {r: 0.03, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []

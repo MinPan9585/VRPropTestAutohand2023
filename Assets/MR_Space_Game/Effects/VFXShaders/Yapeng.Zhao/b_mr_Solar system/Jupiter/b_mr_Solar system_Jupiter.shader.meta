@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: af7f3aa3a718c224e8a9409a8a84b6c7
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _Turbulence_Mars_1: {fileID: 2800000, guid: d264d924685ddea4cb98e4a377d14ac4, type: 3}
+  - _Turbulence_270_c: {fileID: 2800000, guid: bdd1bcbd73212b645ac8b120d1416c5f, type: 3}
+  - _Turbulence_115_c: {fileID: 2800000, guid: 4bcab97d04b4e45448fe69ed9e9b4324, type: 3}
+  nonModifiableTextures: []
+  preprocessorOverride: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 50f79128af4ffc44f9b913410a75181e
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _Turbulence_044_c: {fileID: 2800000, guid: 87edb17899a5b82448bf3e5590a54361, type: 3}
+  - _Turbulence_055_c: {fileID: 2800000, guid: 2bbbffd8a0dbae04398868480248106c, type: 3}
+  nonModifiableTextures: []
+  preprocessorOverride: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: b_mr_Solar system_Venus
+  m_Shader: {fileID: 4800000, guid: 00168d7fb1969c942af22d0c6a940803, type: 3}
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _Main_Tex:
+        m_Texture: {fileID: 2800000, guid: f5136df1d5512134f892c3f33d285d2f, type: 3}
+        m_Scale: {x: 3, y: 3}
+        m_Offset: {x: 0, y: 0}
+    - _Turbulence_115_c:
+        m_Texture: {fileID: 2800000, guid: 503cc052187686943a615344116c8cff, type: 3}
+        m_Scale: {x: 2, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Turbulence_115_c1:
+        m_Texture: {fileID: 2800000, guid: 503cc052187686943a615344116c8cff, type: 3}
+        m_Scale: {x: 2, y: 2}
+        m_Offset: {x: 0, y: 0}
+    - _Turbulence_200_c:
+        m_Texture: {fileID: 2800000, guid: 19a5f51be5172fb4183e4f9acc77c5bd, type: 3}
+        m_Scale: {x: 2, y: 2}
+        m_Offset: {x: 0, y: 0}
+    - _Turbulence_218_c:
+        m_Texture: {fileID: 2800000, guid: a18d5b024b0f08748a4bc4589b5b6900, type: 3}
+        m_Scale: {x: 3, y: 3}
+        m_Offset: {x: 0, y: 0}
+    - _Turbulence_280_c:
+        m_Texture: {fileID: 2800000, guid: c6564b3c7dfbe72459cd974cb800a096, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Turbulence_280_c1:
+        m_Texture: {fileID: 2800000, guid: 09db59aa61f97d74abdaa6bb2aadd55a, type: 3}
+        m_Scale: {x: 2, y: 2}
+        m_Offset: {x: 0, y: 0}
+    - _Turbulence_Mars_1:
+        m_Texture: {fileID: 2800000, guid: fd9e65c4f7d37ec47b276b1330d7c715, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Turbulence_Mars_2:
+        m_Texture: {fileID: 2800000, guid: fd9e65c4f7d37ec47b276b1330d7c715, type: 3}
+        m_Scale: {x: 2, y: 2}
+        m_Offset: {x: 0, y: 0}
+    - _Venus:
+        m_Texture: {fileID: 2800000, guid: 1d8d5a9c46762954fbe2e390810606af, type: 3}
+        m_Scale: {x: 2, y: 2}
+        m_Offset: {x: 0, y: 0.65}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AlphaCutoff: 0.5
+    - _int: 1
+    - _int1: 1
+    m_Colors:
+    - _Color0: {r: 0.7264151, g: 0.4479044, b: 0.044544324, a: 0}
+    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _Flow_color: {r: 0.4528301, g: 0.223925, b: 0.09611958, a: 0}
+    - _Fresnel: {r: 0, g: 1, b: 3, a: 0}
+    - _Fresnel_Color: {r: 0.5943396, g: 0.41364598, b: 0.13176394, a: 0}
+    - _Main_Color: {r: 0.7735849, g: 0.495105, b: 0.22988607, a: 0}
+    - _TexColor: {r: 0.4716981, g: 0.28638816, b: 0.11792453, a: 0}
+    - _Tex_Color: {r: 0.6509434, g: 0.4036665, b: 0.1872995, a: 1}
+    - _Tex_Color1: {r: 0.7529412, g: 0.4566204, b: 0.1960784, a: 1}
+    - _Tex_speed: {r: 0, g: 0, b: 0, a: 0}
+    - _Vector0: {r: 0, g: 0, b: 0, a: 0}
+    - _flow_speed: {r: 0, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []

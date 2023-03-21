@@ -6,8 +6,8 @@ using Autohand;
 
 public class GalaxyPen : MonoBehaviour
 {
-    [SerializeField] private InputActionReference changePrefabAction;
-    [SerializeField] private InputActionReference drawPrefabAction;
+    //[SerializeField] private InputActionReference changePrefabAction;
+    //[SerializeField] private InputActionReference drawPrefabAction;
     public GameObject cloudPrefab;
     public Transform tip;
     float penCooldown = 0.2f;
@@ -15,12 +15,12 @@ public class GalaxyPen : MonoBehaviour
     public GameObject[] brushesPrefab;
     int index = 0;
     bool pressed = false;
-    float scaleMultiplier;
+    //float scaleMultiplier;
 
-    void OnEnable()
-    {
-        changePrefabAction.action.performed += ChangePrefab;
-    }
+    //void OnEnable()
+    //{
+    //    changePrefabAction.action.performed += ChangePrefab;
+    //}
     void Update()
     {
         if (pressed)
@@ -45,33 +45,33 @@ public class GalaxyPen : MonoBehaviour
         pressed = false;
     }
 
-    void ChangePrefab(InputAction.CallbackContext ctx)
-    {
-        if (ctx.performed)
-        {
-            Vector2 joystickValue = ctx.ReadValue<Vector2>();
-            if (joystickValue.x >= 0.2)
-            {
-                if (index < 2)
-                {
-                    index++;
-                }
-                else
-                {
-                    index = 0;
-                }
-            }
-            if (joystickValue.x <= -0.2)
-            {
-                if (index > 0)
-                {
-                    index--;
-                }
-                else
-                {
-                    index = 2;
-                }
-            }
-        }
-    }
+    //void ChangePrefab(InputAction.CallbackContext ctx)
+    //{
+    //    if (ctx.performed)
+    //    {
+    //        Vector2 joystickValue = ctx.ReadValue<Vector2>();
+    //        if (joystickValue.x >= 0.2)
+    //        {
+    //            if (index < 2)
+    //            {
+    //                index++;
+    //            }
+    //            else
+    //            {
+    //                index = 0;
+    //            }
+    //        }
+    //        if (joystickValue.x <= -0.2)
+    //        {
+    //            if (index > 0)
+    //            {
+    //                index--;
+    //            }
+    //            else
+    //            {
+    //                index = 2;
+    //            }
+    //        }
+    //    }
+    //}
 }

@@ -21,7 +21,8 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: FX_com_glow_gj_yunwu_007
-  m_Shader: {fileID: -6465566751694194690, guid: 168b229a419118e4aa06a17b1d0b53e2, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 168b229a419118e4aa06a17b1d0b53e2,
+    type: 3}
   m_ValidKeywords:
   - _SURFACE_TYPE_TRANSPARENT
   m_InvalidKeywords: []
@@ -126,7 +127,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: c55448680a203c94399dffcb911e5fc4, type: 3}
+        m_Texture: {fileID: 2800000, guid: 4e3719775adf7c1499d333b6d5dd5902, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex1:

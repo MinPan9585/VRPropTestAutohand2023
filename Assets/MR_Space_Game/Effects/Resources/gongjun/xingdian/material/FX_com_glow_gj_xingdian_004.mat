@@ -21,7 +21,8 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: FX_com_glow_gj_xingdian_004
-  m_Shader: {fileID: -6465566751694194690, guid: 168b229a419118e4aa06a17b1d0b53e2, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 168b229a419118e4aa06a17b1d0b53e2,
+    type: 3}
   m_ValidKeywords:
   - _SURFACE_TYPE_TRANSPARENT
   m_InvalidKeywords: []
@@ -126,7 +127,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 3d702a91a58d1224d84c52c142b0ddd0, type: 3}
+        m_Texture: {fileID: 2800000, guid: f0ae9f9b309413d43add95a582a8707c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex1:

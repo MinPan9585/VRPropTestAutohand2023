@@ -179,7 +179,6 @@ GameObject:
   - component: {fileID: 534142053315445957}
   - component: {fileID: 534142053315445958}
   - component: {fileID: 534142053315445959}
-  - component: {fileID: 534142053315445952}
   m_Layer: 0
   m_Name: Uranus
   m_TagString: Untagged
@@ -286,36 +285,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 534142053315445952}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOff
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   onRelease:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 534142053315445959}
         m_TargetAssemblyTypeName: Earth, Assembly-CSharp
         m_MethodName: ReleaseEarth
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 534142053315445952}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -353,23 +328,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e696953c50c0cae4ba288be8d33db3a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isReleaseKinematic: 1
   speed: 0.45
   startProgress: 0
   progress: 0
   center: {fileID: 534142054217456769}
   radius: 7
---- !u!114 &534142053315445952
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 534142053315445954}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c276800a20b0254c945d4a161f38cc3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &534142053837225957
 GameObject:
   m_ObjectHideFlags: 0
@@ -383,7 +347,6 @@ GameObject:
   - component: {fileID: 534142053837225976}
   - component: {fileID: 534142053837225977}
   - component: {fileID: 534142053837225978}
-  - component: {fileID: 534142053837225979}
   m_Layer: 0
   m_Name: Venus
   m_TagString: Untagged
@@ -490,36 +453,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 534142053837225979}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOff
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   onRelease:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 534142053837225978}
         m_TargetAssemblyTypeName: Earth, Assembly-CSharp
         m_MethodName: ReleaseEarth
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 534142053837225979}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -557,23 +496,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e696953c50c0cae4ba288be8d33db3a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isReleaseKinematic: 1
   speed: 0.6
   startProgress: 0
   progress: 0
   center: {fileID: 534142054217456769}
   radius: 1.9
---- !u!114 &534142053837225979
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 534142053837225957}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c276800a20b0254c945d4a161f38cc3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &534142053840981614
 GameObject:
   m_ObjectHideFlags: 0
@@ -587,7 +515,6 @@ GameObject:
   - component: {fileID: 534142053840981601}
   - component: {fileID: 534142053840981602}
   - component: {fileID: 534142053840981603}
-  - component: {fileID: 534142053840981612}
   m_Layer: 0
   m_Name: Mars
   m_TagString: Untagged
@@ -694,36 +621,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 534142053840981612}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOff
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   onRelease:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 534142053840981603}
         m_TargetAssemblyTypeName: Earth, Assembly-CSharp
         m_MethodName: ReleaseEarth
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 534142053840981612}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -761,23 +664,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e696953c50c0cae4ba288be8d33db3a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isReleaseKinematic: 1
   speed: 1.1
   startProgress: 0
   progress: 0
   center: {fileID: 534142054217456769}
   radius: 4
---- !u!114 &534142053840981612
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 534142053840981614}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c276800a20b0254c945d4a161f38cc3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &534142054021397665
 GameObject:
   m_ObjectHideFlags: 0
@@ -791,7 +683,6 @@ GameObject:
   - component: {fileID: 534142054021397668}
   - component: {fileID: 534142054021397669}
   - component: {fileID: 534142054021397670}
-  - component: {fileID: 534142054021397671}
   m_Layer: 0
   m_Name: Earth
   m_TagString: Untagged
@@ -898,36 +789,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 534142054021397671}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOff
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   onRelease:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 534142054021397670}
         m_TargetAssemblyTypeName: Earth, Assembly-CSharp
         m_MethodName: ReleaseEarth
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 534142054021397671}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -965,23 +832,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e696953c50c0cae4ba288be8d33db3a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isReleaseKinematic: 1
   speed: 0.8
   startProgress: 0
   progress: 0
   center: {fileID: 534142054217456769}
   radius: 2.9
---- !u!114 &534142054021397671
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 534142054021397665}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c276800a20b0254c945d4a161f38cc3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &534142054217456782
 GameObject:
   m_ObjectHideFlags: 0
@@ -994,7 +850,7 @@ GameObject:
   - component: {fileID: 534142054217456770}
   - component: {fileID: 534142054217456771}
   - component: {fileID: 534142054217456780}
-  - component: {fileID: 534142054217456781}
+  - component: {fileID: 3179681223632688642}
   m_Layer: 0
   m_Name: Sun
   m_TagString: Untagged
@@ -1096,34 +952,10 @@ MonoBehaviour:
   showEvents: 1
   onGrab:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 534142054217456781}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOff
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   onRelease:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 534142054217456781}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOn
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   onSqueeze:
     m_PersistentCalls:
       m_Calls: []
@@ -1140,7 +972,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   lockHandOnGrab: 0
---- !u!114 &534142054217456781
+--- !u!114 &3179681223632688642
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1149,9 +981,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 534142054217456782}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c276800a20b0254c945d4a161f38cc3, type: 3}
+  m_Script: {fileID: 11500000, guid: 85496736aa634fe47b82a11ae99b1cf0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isReleaseKinematic: 1
 --- !u!1 &534142054225900248
 GameObject:
   m_ObjectHideFlags: 0
@@ -1165,7 +998,6 @@ GameObject:
   - component: {fileID: 534142054225900243}
   - component: {fileID: 534142054225900252}
   - component: {fileID: 534142054225900253}
-  - component: {fileID: 534142054225900254}
   m_Layer: 0
   m_Name: Mercury
   m_TagString: Untagged
@@ -1272,36 +1104,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 534142054225900254}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOff
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   onRelease:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 534142054225900253}
         m_TargetAssemblyTypeName: Earth, Assembly-CSharp
         m_MethodName: ReleaseEarth
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 534142054225900254}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1339,23 +1147,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e696953c50c0cae4ba288be8d33db3a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isReleaseKinematic: 1
   speed: 1.9
   startProgress: 0
   progress: 0
   center: {fileID: 534142054217456769}
   radius: 1.2
---- !u!114 &534142054225900254
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 534142054225900248}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c276800a20b0254c945d4a161f38cc3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &534142054645184091
 GameObject:
   m_ObjectHideFlags: 0
@@ -1369,7 +1166,6 @@ GameObject:
   - component: {fileID: 534142054645184094}
   - component: {fileID: 534142054645184095}
   - component: {fileID: 534142054645184088}
-  - component: {fileID: 534142054645184089}
   m_Layer: 0
   m_Name: Saturn
   m_TagString: Untagged
@@ -1476,36 +1272,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 534142054645184089}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOff
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   onRelease:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 534142054645184088}
         m_TargetAssemblyTypeName: Earth, Assembly-CSharp
         m_MethodName: ReleaseEarth
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 534142054645184089}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1543,23 +1315,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e696953c50c0cae4ba288be8d33db3a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isReleaseKinematic: 1
   speed: 0.55
   startProgress: 0
   progress: 0
   center: {fileID: 534142054217456769}
   radius: 6
---- !u!114 &534142054645184089
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 534142054645184091}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c276800a20b0254c945d4a161f38cc3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &534142054750632087
 GameObject:
   m_ObjectHideFlags: 0
@@ -1573,7 +1334,6 @@ GameObject:
   - component: {fileID: 534142054750632106}
   - component: {fileID: 534142054750632107}
   - component: {fileID: 534142054750632084}
-  - component: {fileID: 534142054750632085}
   m_Layer: 0
   m_Name: Neptune
   m_TagString: Untagged
@@ -1680,36 +1440,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 534142054750632085}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOff
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   onRelease:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 534142054750632084}
         m_TargetAssemblyTypeName: Earth, Assembly-CSharp
         m_MethodName: ReleaseEarth
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 534142054750632085}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1747,23 +1483,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e696953c50c0cae4ba288be8d33db3a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isReleaseKinematic: 1
   speed: 0.2
   startProgress: 0
   progress: 0
   center: {fileID: 534142054217456769}
   radius: 8
---- !u!114 &534142054750632085
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 534142054750632087}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c276800a20b0254c945d4a161f38cc3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &534142054839543024
 GameObject:
   m_ObjectHideFlags: 0
@@ -1777,7 +1502,6 @@ GameObject:
   - component: {fileID: 534142054839542795}
   - component: {fileID: 534142054839543028}
   - component: {fileID: 534142054839543029}
-  - component: {fileID: 534142054839543030}
   m_Layer: 0
   m_Name: Jupiter
   m_TagString: Untagged
@@ -1884,36 +1608,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 534142054839543030}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOff
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   onRelease:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 534142054839543029}
         m_TargetAssemblyTypeName: Earth, Assembly-CSharp
         m_MethodName: ReleaseEarth
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 534142054839543030}
-        m_TargetAssemblyTypeName: SwitchKinematic, Assembly-CSharp
-        m_MethodName: SetKinematicOn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1951,23 +1651,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e696953c50c0cae4ba288be8d33db3a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isReleaseKinematic: 1
   speed: 0.39
   startProgress: 0
   progress: 0
   center: {fileID: 534142054217456769}
   radius: 5
---- !u!114 &534142054839543030
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 534142054839543024}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c276800a20b0254c945d4a161f38cc3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &534142053078862499
 PrefabInstance:
   m_ObjectHideFlags: 0
